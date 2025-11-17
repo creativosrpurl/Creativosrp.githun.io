@@ -1,0 +1,544 @@
+/* Estilos globales con tipografía y colores de GTA */
+body {
+  margin: 0;
+  font-family: 'Rajdhani', sans-serif;
+  color: #FFD700; /* Color principal (Oro) */
+  background-color: #000;
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+
+/* Fondo con textura de San Andreas */
+#gta-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url('https://wallpaperaccess.in/public/uploads/preview/cool-gta-san-andreas-wallpaper-1920x1080.jpg');
+  background-size: cover;
+  opacity: 0.4;
+  z-index: -1;
+}
+
+/* Encabezado con estilo GTA */
+.gta-header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 1rem;
+  background-color: rgba(0, 0, 0, 0.7);
+  border-bottom: 3px solid #FF8C00; /* Naranja/Rojo */
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.logo-container {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+/* Logo principal (GTA SA) */
+.gta-logo {
+  width: 80px; 
+  height: 80px;
+  border-radius: 50%;
+  border: 2px solid #FFD700;
+}
+
+.gta-title {
+  font-family: 'Permanent Marker', cursive;
+  font-size: 3rem;
+  color: #FFD700;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+  margin: 0;
+}
+
+/* Botón del menú y navegación */
+.gta-menu-button {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: rgba(0, 0, 0, 0.7);
+  color: #FFD700;
+  border: 2px solid #FF8C00;
+  font-size: 1.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 5px;
+  cursor: pointer;
+  z-index: 1000;
+  font-family: 'Rajdhani', sans-serif;
+}
+
+.gta-navbar {
+  position: fixed;
+  top: 70px;
+  right: 20px;
+  background-color: rgba(0, 0, 0, 0.9);
+  padding: 1rem;
+  border-radius: 5px;
+  border: 2px solid #FF8C00;
+  display: none; 
+  flex-direction: column;
+  z-index: 999;
+}
+
+.gta-navbar.active {
+    display: flex; 
+}
+
+.gta-navbar ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.gta-navbar li {
+  margin: 0.5rem 0;
+}
+
+.gta-navbar a {
+  color: #FFD700;
+  text-decoration: none;
+  font-size: 1.1rem;
+  font-family: 'Rajdhani', sans-serif;
+  transition: color 0.3s;
+}
+
+.gta-navbar a:hover {
+  color: #FF8C00;
+}
+
+/* Secciones y texto */
+.gta-section {
+  padding: 2rem;
+  margin: 1rem;
+  background-color: rgba(0, 0, 0, 0.7);
+  border-radius: 10px;
+  border: 1px solid #FF8C00;
+  text-align: center;
+}
+
+.gta-section-title {
+  font-family: 'Permanent Marker', cursive;
+  color: #FFD700;
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+}
+
+.gta-text {
+  font-size: 1.1rem;
+  color: #FFFFFF;
+  line-height: 1.6;
+}
+
+/* ESTILO PARA LA INFORMACIÓN DINÁMICA DE JS */
+.gta-text.info-asignada {
+    color: #32CD32; 
+    font-size: 1.3rem;
+    padding: 10px;
+    border: 1px dashed #FFD700;
+    display: inline-block;
+    margin-top: 15px;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+.gta-text.info-asignada strong {
+    color: #FF8C00;
+    text-shadow: 0 0 5px rgba(255, 140, 0, 0.5);
+}
+
+/* Clase para resaltar texto importante como los nombres de los CEOs */
+.resaltado {
+  color: #FF8C00;
+  text-shadow: 0 0 5px rgba(255, 140, 0, 0.5);
+}
+
+/* Botón para copiar IP */
+.gta-boton-copiar {
+  background-color: rgba(255, 140, 0, 0.2); /* Fondo naranja muy transparente */
+  color: #FFD700; /* Texto dorado */
+  border: 1px solid rgba(255, 140, 0, 0.5); /* Borde naranja semitransparente */
+  padding: 2px 8px;
+  font-size: 0.9rem;
+  margin-left: 10px;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  vertical-align: middle; /* Mejora la alineación vertical con el texto */
+}
+
+.gta-boton-copiar:hover {
+  background-color: #FF8C00; /* Fondo naranja sólido al pasar el mouse */
+  color: #000; /* Texto negro para contraste */
+  border-color: #FFD700; /* Borde dorado para destacar */
+}
+
+/* Estilos para la nueva sección "Quiénes Somos" */
+.info-columns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+  text-align: left;
+  justify-content: center;
+  margin-top: 2rem;
+}
+
+.info-column {
+  flex: 1;
+  min-width: 280px;
+}
+
+.gta-subsection-title {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 1.5rem;
+  color: #FF8C00;
+  border-bottom: 1px solid #FF8C00;
+  padding-bottom: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.gta-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  color: #fff;
+  line-height: 1.8;
+}
+
+/* Sección Tienda */
+.gta-productos {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+/* 🛑 SOLUCIÓN DEFINITIVA DE VISIBILIDAD DE LA TIENDA 🛑 */
+/* Fondo BLANCO para la SECCIÓN de la tienda (para asegurar el contraste) */
+#tienda {
+  background-color: #000000; /* Fondo negro sólido para la sección de la tienda */
+  /* Los productos serán blancos sobre este fondo negro */
+}
+
+.gta-producto {
+  background: linear-gradient(180deg, rgba(12,12,12,0.92), rgba(24,24,24,0.88));
+  background: linear-gradient(180deg, rgba(20,20,20,0.92), rgba(10,10,10,0.88)), url("data:image/svg+xml,%3Csvg viewBox='0 0 600 600' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  background-blend-mode: color-dodge;
+  opacity: 0.9;
+  padding: 1.5rem;
+  border-radius: 10px;
+  border: 3px solid #FF8C00; 
+  border: 2px solid #FF8C00;
+  border-style: double;
+  border-width: 4px;
+  width: 240px;
+  text-align: center;
+  transition: all 0.5s ease-out;
+  box-shadow: 0 0 14px rgba(255, 140, 0, 0.35);
+  backdrop-filter: blur(2px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.7), inset 0 0 8px rgba(0,0,0,0.5);
+}
+
+/* Imagen del producto */
+.gta-producto-img {
+  width: 100%;
+  height: 135px; /* 16:9 aproximado para 240px de ancho --> 135px alto */
+  object-fit: cover;
+  border-radius: 8px;
+  border: none; /* quitar línea roja/naranja */
+  box-shadow: 0 0 6px rgba(255, 140, 0, 0.35);
+  border: 1px solid rgba(255, 140, 0, 0.4);
+  margin-bottom: 0.75rem;
+  filter: saturate(1.1);
+}
+
+/* Efecto al pasar el mouse */
+.gta-producto:hover {
+  background: linear-gradient(180deg, rgba(18,18,18,0.95), rgba(30,30,30,0.92));
+  opacity: 1;
+  transform: scale(1.05);
+  box-shadow: 0 0 18px rgba(255, 140, 0, 0.5);
+  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.9), 0 0 20px rgba(255, 140, 0, 0.6);
+}
+
+/* Texto del producto */
+.gta-producto-title {
+  color: #FFD700; /* DORADO */
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+  text-shadow: 0 0 6px rgba(255, 140, 0, 0.25);
+}
+
+.gta-producto-price {
+  color: #FFE08A; /* Dorado claro para buen contraste */
+  color: #32CD32; /* Verde dinero, clásico de GTA */
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
+  font-weight: bold;
+  text-shadow: 0 0 8px rgba(50, 205, 50, 0.5);
+}
+/* FIN DE LOS CAMBIOS DE LA TIENDA */
+
+
+.gta-boton {
+  background-color: #FF8C00;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 5px;
+  cursor: pointer;
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: bold;
+  transition: background-color 0.3s;
+}
+
+.gta-boton:hover {
+  background-color: #FFD700;
+}
+
+/* === FORMULARIO ESTILO DIÁLOGO SA-MP === */
+/* Contenedor de la sección de reclamos */
+#reclamos {
+  background-color: transparent; /* Hacemos transparente el fondo de la sección */
+  border: none; /* Quitamos el borde de la sección */
+  padding-top: 1rem;
+  padding: 0; /* ANULA el padding de .gta-section para que el diálogo no tenga espacio extra */
+  padding-bottom: 1rem;
+}
+
+/* El formulario ahora es la ventana de diálogo */
+.gta-form {
+  max-width: 450px;
+  margin: 0 auto;
+  background-color: rgba(0, 0, 0, 0.85);
+  border: 2px solid #555;
+  box-shadow: 0 0 20px rgba(0,0,0,0.7);
+  text-align: left; /* Alineamos el texto a la izquierda dentro del form */
+}
+
+/* Título de la sección ahora actúa como cabecera del diálogo */
+#titulo-reclamos {
+  font-family: 'Rajdhani', sans-serif; /* Usamos la fuente normal, no la de graffiti */
+  font-size: 1.2rem;
+  background-color: #FF8C00; /* Naranja SA-MP */
+  color: black;
+  padding: 0.5rem 1rem;
+  margin: 0; /* Quitamos márgenes para que se pegue al borde */
+  text-shadow: none;
+  text-align: center; /* Centramos el título del diálogo */
+}
+
+.gta-input, .gta-textarea {
+  display: block;
+  width: calc(100% - 2rem); /* Ancho completo menos el padding */
+  margin: 1rem 1rem 0 1rem;
+  padding: 0.7rem;
+  border-radius: 0; /* Bordes rectos */
+  border: 1px solid #777;
+  background-color: #222;
+  color: #FFFFFF;
+  font-family: 'Rajdhani', sans-serif;
+}
+
+.gta-input::placeholder, .gta-textarea::placeholder {
+  color: #AAAAAA;
+}
+
+/* Contenedor para los botones del formulario */
+.gta-form .gta-boton {
+  margin: 1.5rem 1rem 1rem auto; /* Margen para alinear a la derecha */
+  display: block;
+  border-radius: 2px;
+}
+/* === FIN DE ESTILOS DE FORMULARIO === */
+
+/* Redes Sociales */
+.gta-redes {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+}
+
+.gta-red-icon {
+  display: block;
+  transition: transform 0.3s;
+}
+
+.gta-red-icon:hover {
+  transform: scale(1.2);
+}
+
+/* TAMAÑO DE LOGOS DE REDES SOCIALES FIJADO */
+.gta-red-icon img {
+  width: 50px;
+  height: 50px;
+  border-radius: 5px;
+  border: 1px solid #FF8C00;
+  width: 50px !important; 
+  height: 50px !important;
+}
+/* Quitar borde solo del logo de YouTube */
+.gta-red-icon[aria-label="YouTube"] img {
+  border: none;
+}
+
+/* === MODAL DE COMPRA ESTILO GTA === */
+.gta-modal {
+  position: fixed;
+  z-index: 1500;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.gta-modal[hidden] {
+  display: none;
+}
+
+.gta-modal-content {
+  max-width: 500px;
+  width: 90%;
+  background-color: rgba(0, 0, 0, 0.9);
+  border: 2px solid #555;
+  box-shadow: 0 5px 25px rgba(0,0,0,0.8);
+  animation: fadeIn 0.3s ease-out;
+}
+
+.gta-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #FF8C00;
+  padding: 0.5rem 1rem;
+}
+
+.gta-modal-header h3 {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 1.2rem;
+  color: black;
+  margin: 0;
+  text-shadow: none;
+}
+
+.gta-modal-close {
+  color: black;
+  font-size: 2rem;
+  font-weight: bold;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.gta-modal-body {
+  padding: 1.5rem;
+}
+
+.gta-modal-body .gta-input {
+  width: calc(100% - 1.4rem); /* Ajuste para el padding interno */
+  margin: 0.5rem 0 1rem 0;
+}
+
+.gta-modal-footer {
+  padding: 1rem;
+  text-align: right;
+}
+
+.payment-options {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+/* Botón para volver atrás en el modal */
+.gta-boton-atras {
+  background: none;
+  border: 1px solid #FF8C00;
+  color: #FF8C00;
+  padding: 0.25rem 0.75rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+  margin-bottom: 1rem;
+  border-radius: 4px;
+  transition: all 0.3s;
+}
+.gta-boton-atras:hover {
+  background: #FF8C00;
+  color: #000;
+}
+/* Responsividad */
+@media (max-width: 768px) {
+    .gta-header {
+        justify-content: space-between;
+    }
+    .gta-title {
+        font-size: 2rem;
+    }
+    .logo-container {
+        gap: 0.5rem;
+    }
+    .gta-navbar {
+        top: 70px;
+        right: 10px;
+        left: 10px;
+        width: auto;
+    }
+
+    /* Ajuste para la sección "Quiénes Somos" en móviles */
+    .info-columns {
+      flex-direction: column; /* Apila las columnas principales verticalmente */
+    }
+    .info-column .gta-list {
+      column-count: 2; /* Divide las listas largas en 2 columnas */
+      column-gap: 1.5rem;
+    }
+}
+
+/* Utilidad: solo para lectores de pantalla */
+.sr-only {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+/* Toast: notificaciones no intrusivas */
+.toast {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.85);
+  color: #FFFFFF;
+  padding: 0.75rem 1rem;
+  border-radius: 6px;
+  border: 1px solid #FF8C00;
+  box-shadow: 0 0 10px rgba(255, 140, 0, 0.4);
+  z-index: 2000;
+  max-width: 90vw;
+  text-align: center;
+}
+.toast[hidden] { display: none; }
+
+/* Footer */
+.gta-footer {
+  padding: 1rem;
+  text-align: center;
+  background: rgba(0, 0, 0, 0.7);
+  border-top: 3px solid #FF8C00;
+  margin-top: 2rem;
+}

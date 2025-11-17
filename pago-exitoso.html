@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>¡Pago Exitoso! - Creativos RP</title>
+  <link rel="icon" href="logos/logo-gta-san-andreas.jpg" type="image/jpeg">
+
+  <!-- Fuentes y estilos -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Rajdhani:wght@600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+
+  <style>
+    /* Estilos específicos para esta página de éxito */
+    .success-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      text-align: center;
+      padding: 2rem;
+    }
+    .success-box {
+      max-width: 600px;
+    }
+    .success-box .gta-section-title {
+        color: #32CD32; /* Verde para éxito */
+        text-shadow: 0 0 8px rgba(50, 205, 50, 0.5);
+    }
+    .receipt-table {
+      width: 100%;
+      margin-top: 2rem;
+      text-align: left;
+      border-collapse: collapse;
+    }
+    .receipt-table td {
+      padding: 0.75rem;
+      border-bottom: 1px solid #444;
+      color: #fff;
+    }
+    .receipt-table td:first-child {
+      color: #FFD700;
+      font-weight: bold;
+    }
+    .receipt-table tr:last-child td {
+      border-bottom: none;
+    }
+  </style>
+</head>
+<body>
+  <div id="gta-bg" aria-hidden="true"></div>
+
+  <main class="success-container">
+    <div class="success-box gta-section">
+      <h1 class="gta-section-title">¡Transacción Aprobada!</h1>
+      <p class="gta-text">
+        Gracias por tu compra, <strong id="display-username">jugador</strong>. Para recibir tus Coins, por favor sigue estos pasos:
+      </p>
+
+      <!-- Tabla de detalles de la compra -->
+      <table class="receipt-table">
+        <tbody>
+          <tr><td>Usuario SA-MP:</td><td id="receipt-username">--</td></tr>
+          <tr><td>Producto:</td><td id="receipt-item">--</td></tr>
+          <tr><td>Monto Pagado:</td><td id="receipt-amount">--</td></tr>
+          <tr><td>Fecha del Pago:</td><td id="receipt-date">--</td></tr>
+          <tr><td>ID de Transacción:</td><td id="receipt-orderID">--</td></tr>
+        </tbody>
+      </table>
+
+      <p class="gta-text" style="text-align: left; display: inline-block;">
+        1. Toma una <strong>captura de pantalla</strong> de esta página o del correo de confirmación de PayPal.<br>
+        2. Únete a nuestro Discord y abre un ticket.<br>
+        3. Envía la captura al Staff para que validen tu compra y te entreguen los Coins en el juego.
+      </p>
+      <a href="https://discord.gg/EsgBcUCubQ" target="_blank" class="gta-boton" style="margin-top: 2rem;">Ir a Discord</a>
+    </div>
+  </main>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      
+      // Extraemos todos los datos de la URL
+      const username = urlParams.get('username');
+      const itemName = urlParams.get('itemName');
+      const amount = urlParams.get('amount');
+      const currency = urlParams.get('currency');
+      const dateStr = urlParams.get('date');
+      const orderID = urlParams.get('orderID');
+
+      // Mostramos los datos en la página
+      document.getElementById('display-username').textContent = username || 'jugador';
+      document.getElementById('receipt-username').textContent = username || 'No especificado';
+      document.getElementById('receipt-item').textContent = itemName || 'No especificado';
+      if (amount && currency) {
+        // Formateamos el monto según la moneda recibida
+        const formatOptions = {
+          style: 'currency',
+          currency: currency,
+          minimumFractionDigits: currency === 'COP' ? 0 : 2
+        };
+        const locale = currency === 'COP' ? 'es-CO' : 'en-US';
+        document.getElementById('receipt-amount').textContent = new Intl.NumberFormat(locale, formatOptions).format(amount);
+      } else {
+        document.getElementById('receipt-amount').textContent = 'No especificado';
+      }
+      document.getElementById('receipt-orderID').textContent = orderID || 'No especificado';
+
+      if (dateStr) {
+        // Formateamos la fecha para que sea más legible
+        const date = new Date(dateStr);
+        const options = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+        document.getElementById('receipt-date').textContent = date.toLocaleDateString('es-ES', options);
+      } else {
+        document.getElementById('receipt-date').textContent = 'No especificado';
+      }
+    });
+  </script>
+</body>
+</html>

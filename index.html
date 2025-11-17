@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Creativos RP - GTA San Andreas Online</title>
+  <meta name="description" content="Creativos RP: Servidor de GTA San Andreas Online (Roleplay). Vive realismo, acción y una comunidad vibrante. Tienda, reclamos y contacto.">
+  <link rel="icon" href="logos/logo-gta-san-andreas.jpg" type="image/jpeg">
+
+  <!-- SEO / Social -->
+  <meta property="og:title" content="Creativos RP - GTA San Andreas Online">
+  <meta property="og:description" content="Servidor de GTA San Andreas Online (Roleplay). Vive realismo, acción y comunidad.">
+  <meta property="og:image" content="logos/logo-gta-san-andreas.jpg">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+
+  <!-- Fuentes -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Rajdhani:wght@600&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="styles.css">
+
+  <!-- Librerías (defer para rendimiento) -->
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/gsap.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/ScrollTrigger.min.js"></script>
+  <script defer src="script.js"></script>
+  <!--
+    🛑 IMPORTANTE: REEMPLAZA 'YOUR_CLIENT_ID' CON TU CLIENT ID REAL DE PAYPAL 🛑
+  -->
+  <script src="https://www.paypal.com/sdk/js?client-id=AagyPmeX_T468-gNxd3f1-7EjCN4PRA9bscqqladEVD6URCXUYsk0dh7wrHAarGZICC6hCh3ArTX1u37&currency=USD" data-sdk-integration-source="developer-studio"></script>
+</head>
+<body>
+  <div id="gta-bg" aria-hidden="true"></div>
+
+  <header class="gta-header" role="banner">
+    <div class="logo-container">
+      <img src="logos/logo-gta-san-andreas.jpg" alt="Creativos RP - Logo GTA San Andreas" class="gta-logo" width="80" height="80" loading="eager">
+      <h1 class="gta-title">Creativos RP</h1>
+    </div>
+
+    <button class="gta-menu-button" id="menu-button" aria-label="Abrir menú" aria-controls="navbar" aria-expanded="false">☰</button>
+  </header>
+
+  <nav class="gta-navbar" id="navbar" aria-label="Navegación principal">
+    <ul>
+      <li><a href="#inicio">Inicio</a></li>
+      <li><a href="#quienes-somos">Quiénes Somos</a></li>
+      <li><a href="#tienda">Tienda</a></li>
+      <li><a href="#reclamos">Reclamos</a></li>
+      <li><a href="#redes">Contáctanos</a></li>
+    </ul>
+  </nav>
+
+  <main id="contenido-principal">
+    <section id="inicio" class="gta-section" aria-labelledby="titulo-inicio">
+      <h2 id="titulo-inicio" class="gta-section-title">Bienvenidos a Creativos Roleplay</h2>
+      <p class="gta-text">
+        Vive la experiencia de <strong>GTA San Andreas Online</strong> en un servidor único, con realismo, acción y una comunidad vibrante.
+      </p>
+      <div id="server-info-container">
+      <!-- Contenido dinámico (jugadores/IP) se inyecta aquí desde script.js -->
+      </div>
+
+    </section>
+
+    <section id="quienes-somos" class="gta-section" aria-labelledby="titulo-quienes-somos">
+      <h2 id="titulo-quienes-somos" class="gta-section-title">¡Sumérgete en la acción de GTA New Creativos Roleplay!</h2>
+      <p class="gta-text">
+        ¿Buscas un servidor de GTA Roleplay con sistemas innovadores y un equipo de staff dedicado? ¡No busques más! En Creativos RP, te ofrecemos una experiencia de roleplay inigualable donde tú decides quién quieres ser.
+      </p>
+      <div class="info-columns">
+        <div class="info-column">
+          <h3 class="gta-subsection-title">Elige tu camino entre una variedad de trabajos:</h3>
+          <ul class="gta-list">
+            <li>Carguero ‍♂️</li>
+            <li>Delincuente</li>
+            <li>Basurero ♻️</li>
+            <li>Camionero</li>
+            <li>Ladrón</li>
+            <li>Carpintero 🪚</li>
+            <li>Aserrador</li>
+            <li>Mecánico 👨‍🔧</li>
+            <li>Granjero</li>
+            <li>Traficante</li>
+            <li>Armero ⚔️</li>
+            <li>Recolector</li>
+            <li>Minero 👨‍Mining</li>
+            <li>Guardaespaldas</li>
+          </ul>
+        </div>
+        <div class="info-column">
+          <h3 class="gta-subsection-title">Únete a una de nuestras facciones:</h3>
+          <ul class="gta-list">
+            <li>PNH 👨‍✈️</li>
+             <li>DNVT 👮</li>
+            <li>FFAA 🪖</li>
+            <li>FEIC</li>
+            <li>GOBIERNO 👨‍💼</li>
+             <li>HCN 🎤</li>
+             <li>Médico 👨‍⚕️</li>
+             <li>Bombero 👨‍🚒</li>
+          </ul>
+          <h3 class="gta-subsection-title">¡Experimenta sistemas de juego únicos!</h3>
+          <p class="gta-text">Sistema de conquista de territorios, atracos a bancos, robo de cajeros automáticos, asaltos a negocios, robo de casas, creación de bandas y pandillas ✅, mercados negros 🕵️, sistema de membresías VIP, personalización con neón, nitro para vehículos 💨, compra y venta de coches.</p>
+        </div>
+      </div>
+      <div style="margin-top: 2rem;">
+        <h3 class="gta-subsection-title">Nuestros CEOs</h3>
+        <p class="gta-text">Liderando la comunidad con visión y dedicación: <strong class="resaltado">Franklin Figueroa</strong> y <strong class="resaltado">Mr Beast</strong>.</p>
+      </div>
+    </section>
+
+    <section id="tienda" class="gta-section" aria-labelledby="titulo-tienda">
+      <h2 id="titulo-tienda" class="gta-section-title">Tienda Creativos RP</h2>
+      <ul class="gta-productos">
+        <li class="gta-producto">
+          <img class="gta-producto-img" src="logos/coins.jpg" alt="Coins" loading="lazy" width="600" height="338">
+          <h3 class="gta-producto-title">Coins</h3>
+          <p class="gta-producto-price">$5.00</p>
+          <small class="gta-producto-note">Pago ooc</small>
+          <button id="buy-coins-btn" class="gta-boton" type="button" aria-label="Comprar Coins">Comprar</button> 
+        </li>
+        <li class="gta-producto">
+          <img class="gta-producto-img" src="logos/empresas.jpg?v=1" alt="Empresas" loading="lazy" width="600" height="338">
+          <h3 class="gta-producto-title">Empresas</h3>
+          <p class="gta-producto-price">150 Coins</p>
+          <small class="gta-producto-note">Pago en Coins</small>
+          <button class="gta-boton gta-boton-discord" type="button" aria-label="Comprar Empresas por Discord">Comprar por Discord</button>
+        </li>
+        <li class="gta-producto">
+          <img class="gta-producto-img" src="logos/tiendas.jpg" alt="Tiendas" loading="lazy" width="600" height="338">
+          <h3 class="gta-producto-title">Tiendas</h3>
+          <p class="gta-producto-price">50 Coins</p>
+          <small class="gta-producto-note">Pago en Coins</small>
+          <button class="gta-boton gta-boton-discord" type="button" aria-label="Comprar Tiendas por Discord">Comprar por Discord</button>
+        </li>
+        <li class="gta-producto">
+          <img class="gta-producto-img" src="logos/casas.jpg" alt="casas privadas" loading="lazy" width="600" height="338">
+          <h3 class="gta-producto-title">casas privadas</h3>
+          <p class="gta-producto-price">$6.00 USD</p>
+          <small class="gta-producto-note">Pago ooc</small>
+          <button id="buy-house-btn" class="gta-boton" type="button" aria-label="Comprar casa privada">Comprar</button>
+        </li>
+      </ul>
+    </section>
+
+    <section id="reclamos" class="gta-section" aria-labelledby="titulo-reclamos">
+      <h2 id="titulo-reclamos" class="gta-section-title">Reclamos al Staff</h2>
+      <form id="form-reclamos" class="gta-form" action="https://formspree.io/f/mdkyvrkp" method="POST">
+        <label class="sr-only" for="nombre">Nombre</label>
+        <input id="nombre" name="nombre" type="text" placeholder="Nombre" class="gta-input" required autocomplete="name">
+
+        <label class="sr-only" for="correo">Correo</label>
+        <input id="correo" name="_replyto" type="email" placeholder="Correo" class="gta-input" required autocomplete="email">
+
+        <label class="sr-only" for="mensaje">Describe tu reclamo</label>
+        <textarea id="mensaje" name="mensaje" placeholder="Describe tu reclamo" class="gta-textarea" required rows="5"></textarea>
+
+        <label for="enlace-imagen" class="gta-label" style="margin-top: 1rem; display: block;">Enlace a la imagen (opcional):</label>
+        <input id="enlace-imagen" name="enlace_imagen" type="url" placeholder="https://imgur.com/tu-imagen" class="gta-input" style="margin-bottom: 1rem;">
+        <small class="gta-text" style="display: block; margin-top: -0.5rem; font-size: 0.9em; color: #aaa;">Sube tu imagen a <a href="https://imgur.com/upload" target="_blank" rel="noopener">Imgur</a> y pega el enlace aquí.</small>
+
+        <button type="submit" class="gta-boton">Enviar</button>
+      </form>
+    </section>
+
+    <section id="redes" class="gta-section" aria-labelledby="titulo-redes">
+      <h2 id="titulo-redes" class="gta-section-title">Únete - Creativos RP</h2>
+      <div class="gta-redes">
+        <a href="https://discord.gg/EsgBcUCubQ" target="_blank" rel="noopener" class="gta-red-icon" aria-label="Discord">
+          <img src="logos/discord-icon.jpg" alt="Discord" width="50" height="50" loading="lazy">
+        </a>
+        <a href="https://www.tiktok.com/@creativos.roleplay?_r=1&_t=ZM-91TirQgJauG" target="_blank" rel="noopener" class="gta-red-icon" aria-label="TikTok">
+          <img src="logos/tiktok-icon.jpg" alt="TikTok" width="50" height="50" loading="lazy">
+        </a>
+        <a href="https://youtube.com/creativosrp" target="_blank" rel="noopener" class="gta-red-icon" aria-label="YouTube">
+          <img src="logos/youtube-icon.jpg" alt="YouTube" width="50" height="50" loading="lazy">
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <div id="toast" role="status" aria-live="polite" aria-atomic="true" class="toast" hidden></div>
+
+  <!-- Modal para la compra de Coins -->
+  <div id="purchase-modal" class="gta-modal" hidden>
+    <div class="gta-modal-content">
+      <header class="gta-modal-header">
+        <h3 id="titulo-modal">Comprar Coins</h3>
+        <button id="close-modal-btn" class="gta-modal-close" aria-label="Cerrar">&times;</button>
+      </header>
+      <div class="gta-modal-body">
+        <!-- Paso 1: Selección de método de pago -->
+        <div id="payment-method-step">
+          <p class="gta-text">Elige tu método de pago preferido:</p>
+          <div class="payment-options">
+            <button id="select-paypal-btn" class="gta-boton">Pagar con PayPal</button>
+            <button id="select-nequi-btn" class="gta-boton">Pagar con Nequi</button>
+          </div>
+        </div>
+
+        <!-- Paso 2: Formulario de PayPal -->
+        <div id="paypal-step" hidden>
+          <button type="button" class="gta-boton-atras">← Volver</button>
+          <form id="purchase-form">
+            <label for="samp-username" class="gta-label">Nombre de usuario en SA-MP:</label>
+            <input id="samp-username" type="text" placeholder="TuNombre_Apellido" class="gta-input" required>
+            <label for="coin-package" class="gta-label">Selecciona un paquete:</label>
+            <select id="coin-package" name="coin-package" class="gta-input">
+              <option value="1.00" data-name="5 Coins">5 Coins - $1.00 USD</option>
+              <option value="2.00" data-name="10 Coins">10 Coins - $2.00 USD</option>
+              <option value="5.00" data-name="25 Coins">25 Coins - $5.00 USD</option>
+              <option value="9.00" data-name="50 Coins">50 Coins - $9.00 USD</option>
+              <option value="16.00" data-name="100 Coins">100 Coins - $16.00 USD</option>
+            </select>
+          </form>
+          <div id="paypal-button-container" style="margin-top: 1rem;"></div>
+        </div>
+
+        <!-- Paso 2: Instrucciones de Nequi -->
+        <div id="nequi-step" hidden>
+          <button type="button" class="gta-boton-atras">← Volver</button>
+          <p class="gta-text">Selecciona tu paquete, escanea el código QR y envía el monto exacto. Luego, contacta al Staff en Discord con tu comprobante.</p>
+          <label for="nequi-coin-package" class="gta-label">Selecciona un paquete:</label>
+          <select id="nequi-coin-package" name="nequi-coin-package" class="gta-input">
+            <option value="4000">5 Coins - $4,000 COP</option>
+            <option value="8000">10 Coins - $8,000 COP</option>
+            <option value="20000">25 Coins - $20,000 COP</option>
+            <option value="35000">50 Coins - $35,000 COP</option>
+            <option value="65000">100 Coins - $65,000 COP</option>
+          </select>
+          <p id="nequi-amount-display" class="gta-text info-asignada" style="margin-top: 1rem;">Monto a enviar: <strong>$4,000 COP</strong></p>
+          <img id="nequi-qr" src="logos/codigo qr.png" alt="Código QR de Nequi" style="max-width: 200px; margin: 1rem auto; display: block; border-radius: 10px; border: 2px solid #FF8C00;" onerror="this.onerror=null; this.alt='Error: No se pudo cargar el código QR. Revisa que el archivo \'codigo qr.png\' esté en la carpeta logos.';">
+          <a href="https://discord.gg/EsgBcUCubQ" target="_blank" class="gta-boton" style="margin-top: 1rem;">Ir a Discord para confirmar</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Audio para la interfaz -->
+  <audio id="ui-click-sound" src="https://www.myinstants.com/media/sounds/gtasa-menu-scroll.mp3" preload="auto"></audio>
+
+  <footer class="gta-footer" role="contentinfo">
+    <p class="gta-text">© <span id="anio"></span> Creativos RP · GTA San Andreas Roleplay</p>
+    <p class="gta-text" style="font-size: 0.9em; color: #aaa; margin-top: 0.5rem;">Creador de la página: Mr Beast</p>
+  </footer>
+</body>
+</html>
