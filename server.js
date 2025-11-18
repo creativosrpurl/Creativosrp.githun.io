@@ -71,15 +71,30 @@ async function sendDiscordNotification(details) {
     const channel = await discordClient.channels.fetch(DISCORD_LOG_CHANNEL_ID);
     if (!channel) return;
 
+    const embedFields = [
+      { name: 'Usuario SA-MP', value: details.username, inline: true },
+      { name: 'Producto', value: details.itemName, inline: true },
+      { name: 'Monto Pagado', value: `**${details.amount} ${details.currency}**`, inline: true },
+      { name: 'ID de Transacción', value: `\`${details.orderID}\`` }
+    ];
+
+    // Lógica para añadir información del cupón
+    if (details.promoCode) {
+      const codeData = promoCodes[details.promoCode];
+      if (codeData) {
+        if (codeData.adminOnly) {
+          embedFields.push({ name: 'Cupón Usado', value: 'Admin (Gratis)', inline: true });
+        } else {
+          const discountValue = codeData.type === 'percent' ? `${codeData.value}%` : `$${codeData.value} USD`;
+          embedFields.push({ name: 'Cupón Usado', value: `${details.promoCode} (${discountValue})`, inline: true });
+        }
+      }
+    }
+
     const embed = new EmbedBuilder()
       .setColor(details.amount === '0.00' ? '#FFA500' : '#00FF00')
       .setTitle('✅ Nueva Compra Realizada')
-      .addFields(
-        { name: 'Usuario SA-MP', value: details.username, inline: true },
-        { name: 'Producto', value: details.itemName, inline: true },
-        { name: 'Monto Pagado', value: `${details.amount} ${details.currency}`, inline: true },
-        { name: 'ID de Transacción', value: `\`${details.orderID}\`` }
-      )
+      .addFields(embedFields)
       .setTimestamp();
 
     await channel.send({ embeds: [embed] });
