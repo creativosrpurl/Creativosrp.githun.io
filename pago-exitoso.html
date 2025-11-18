@@ -12,6 +12,9 @@
   <link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Rajdhani:wght@600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
 
+  <!-- Librería para generar la imagen del comprobante -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" integrity="sha512-BNaRQnYJYiPSqHHDb58B0yaPfCu+Wgds8Gp/gU33kqBtgNS4tSPHuGibyoVBL5gI9kDXrdZEo8NNYCKaYHNssg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
   <style>
     /* Estilos específicos para esta página de éxito */
     .success-container {
@@ -32,7 +35,7 @@
     }
     .receipt-table {
       width: 100%;
-      margin-top: 2rem;
+      margin-top: 1.5rem; /* Reducido */
       text-align: left;
       border-collapse: collapse;
     }
@@ -56,7 +59,7 @@
   <main class="success-container">
     <div class="success-box gta-section">
       <h1 class="gta-section-title">¡Transacción Aprobada!</h1>
-      <p class="gta-text">
+      <p class="gta-text" style="margin-bottom: 1rem;">
         Gracias por tu compra, <strong id="display-username">jugador</strong>. Para recibir tus Coins, por favor sigue estos pasos:
       </p>
 
@@ -67,21 +70,40 @@
           <tr><td>Producto:</td><td id="receipt-item">--</td></tr>
           <tr><td>Monto Pagado:</td><td id="receipt-amount">--</td></tr>
           <tr><td>Fecha del Pago:</td><td id="receipt-date">--</td></tr>
-          <tr><td>ID de Transacción:</td><td id="receipt-orderID">--</td></tr>
+          <tr>
+            <td>ID de Transacción:</td>
+            <td style="display: flex; justify-content: space-between; align-items: center;">
+              <span id="receipt-orderID">--</span>
+              <button id="copy-order-id-btn" class="gta-boton-copiar" style="display: none;">Copiar</button>
+            </td>
+          </tr>
         </tbody>
       </table>
 
-      <p class="gta-text" style="text-align: left; display: inline-block;">
+      <p class="gta-text" style="text-align: left; display: inline-block; margin-top: 1rem; font-size: 0.9em;">
         1. Toma una <strong>captura de pantalla</strong> de esta página o del correo de confirmación de PayPal.<br>
         2. Únete a nuestro Discord y abre un ticket.<br>
         3. Envía la captura al Staff para que validen tu compra y te entreguen los Coins en el juego.
       </p>
-      <a href="https://discord.gg/EsgBcUCubQ" target="_blank" class="gta-boton" style="margin-top: 2rem;">Ir a Discord</a>
+      <div class="gta-button-group">
+        <button id="download-receipt-btn" class="gta-boton">Descargar Comprobante</button>
+        <a href="https://discord.gg/EsgBcUCubQ" target="_blank" class="gta-boton">Ir a Discord</a>
+        <a href="index.html" class="gta-boton">Volver al Inicio</a>
+      </div>
     </div>
   </main>
 
   <script>
     document.addEventListener('DOMContentLoaded', () => {
+      // Carga la imagen de fondo dinámicamente, igual que en index.html
+      const bgElement = document.getElementById('gta-bg');
+      if (bgElement) {
+        const bgImageUrl = 'https://wallpaperaccess.in/public/uploads/preview/cool-gta-san-andreas-wallpaper-1920x1080.jpg';
+        bgElement.style.backgroundImage = `url(${bgImageUrl})`;
+        bgElement.style.opacity = '0.4';
+      }
+
+      const successBox = document.querySelector('.success-box');
       const urlParams = new URLSearchParams(window.location.search);
       
       // Extraemos todos los datos de la URL
@@ -91,6 +113,28 @@
       const currency = urlParams.get('currency');
       const dateStr = urlParams.get('date');
       const orderID = urlParams.get('orderID');
+
+      // ¡NUEVO! Enviar notificación al backend en cuanto se carga la página.
+      // Esto es seguro porque solo se ejecuta después de un pago real.
+      const IS_LOCAL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+      // 🛑 Pega aquí la URL que te dará Render en el Paso 3.
+      const RENDER_URL = 'https://creativos-rp-server.onrender.com'; 
+      const API_URL = IS_LOCAL ? 'http://localhost:3000' : RENDER_URL;
+
+      fetch(`${API_URL}/log-purchase`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          username: username,
+          itemName: itemName,
+          amount: amount,
+          currency: currency,
+          orderID: orderID
+        })
+      }).catch(error => {
+        console.error('No se pudo enviar la notificación de compra al servidor:', error);
+        // No es un error crítico para el usuario, por lo que no mostramos alerta.
+      });
 
       // Mostramos los datos en la página
       document.getElementById('display-username').textContent = username || 'jugador';
@@ -118,6 +162,59 @@
       } else {
         document.getElementById('receipt-date').textContent = 'No especificado';
       }
+      
+      // Lógica para el botón de copiar ID de transacción
+      const copyBtn = document.getElementById('copy-order-id-btn');
+      if (orderID) {
+        copyBtn.style.display = 'inline-block'; // Muestra el botón si hay un ID
+        copyBtn.addEventListener('click', () => {
+          navigator.clipboard.writeText(orderID).then(() => {
+            copyBtn.textContent = '¡Copiado!';
+            setTimeout(() => { copyBtn.textContent = 'Copiar'; }, 2000);
+          }).catch(() => alert('Error al copiar el ID.'));
+        });
+      }
+      
+      // Lógica para descargar el comprobante
+      const downloadBtn = document.getElementById('download-receipt-btn');
+      downloadBtn.addEventListener('click', () => {
+        downloadBtn.textContent = 'Generando imagen...';
+        downloadBtn.disabled = true;
+
+        // Añadimos un timeout para evitar que se quede "pegado" indefinidamente
+        const generationTimeout = setTimeout(() => {
+          downloadBtn.textContent = 'Descargar Comprobante';
+          downloadBtn.disabled = false;
+          alert('La generación de la imagen tardó demasiado. Es posible que estés abriendo el archivo localmente. Por favor, usa un servidor web o toma una captura de pantalla manualmente.');
+        }, 10000); // 10 segundos
+
+
+        // Usamos html2canvas para "fotografiar" el div del comprobante
+        html2canvas(successBox, {
+          backgroundColor: '#000', // Fondo negro para la captura
+          scale: 2, // Aumenta la resolución de la imagen
+          useCORS: true // Permite cargar imágenes de otros dominios (como el fondo)
+        }).then(canvas => {
+          clearTimeout(generationTimeout); // Si funciona, cancelamos el timeout
+
+          // Creamos un enlace temporal para la descarga
+          const link = document.createElement('a');
+          link.download = `comprobante-creativos-rp-${orderID || username}.png`;
+          link.href = canvas.toDataURL('image/png');
+          link.click(); // Simulamos un clic para iniciar la descarga
+
+          // Restauramos el botón
+          downloadBtn.textContent = 'Descargar Comprobante';
+          downloadBtn.disabled = false;
+        }).catch((error) => {
+            clearTimeout(generationTimeout); // Si falla, también cancelamos el timeout
+
+            console.error('Error al generar el comprobante:', error);
+            alert('Hubo un error al generar la imagen. Por favor, toma una captura de pantalla manualmente.');
+            downloadBtn.textContent = 'Descargar Comprobante';
+            downloadBtn.disabled = false;
+        });
+      });
     });
   </script>
 </body>
