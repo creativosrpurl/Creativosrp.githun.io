@@ -24,8 +24,8 @@ body {
 /* Encabezado con estilo GTA */
 .gta-header {
   display: flex;
-  justify-content: center;
-  align-items: center;
+  justify-content: space-between; /* Cambiado para separar logo y menú */
+  align-items: center; /* Alinea verticalmente los elementos */
   padding: 1rem;
   background-color: rgba(0, 0, 0, 0.7);
   border-bottom: 3px solid #FF8C00; /* Naranja/Rojo */
@@ -34,10 +34,13 @@ body {
   z-index: 100;
 }
 
-.logo-container {
+/* Contenedor para la parte izquierda (logo) */
+.header-left {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  justify-content: flex-start;
+  /* No flex: 1 here, let it take its content width */
+  flex-shrink: 0; /* Ensure it doesn't shrink */
 }
 
 /* Logo principal (GTA SA) */
@@ -53,14 +56,14 @@ body {
   font-size: 3rem;
   color: #FFD700;
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
-  margin: 0;
+  text-align: center; /* Centra el título en el espacio disponible */
+  margin: 0 1rem; /* Añade un pequeño espacio a los lados */
+  flex-grow: 1; /* Allow title to grow and take available space */
+  min-width: 0; /* Permite que el título se encoja si no hay espacio */
 }
 
 /* Botón del menú y navegación */
 .gta-menu-button {
-  position: fixed;
-  top: 20px;
-  right: 20px;
   background: rgba(0, 0, 0, 0.7);
   color: #FFD700;
   border: 2px solid #FF8C00;
@@ -68,8 +71,8 @@ body {
   padding: 0.5rem 1rem;
   border-radius: 5px;
   cursor: pointer;
-  z-index: 1000;
   font-family: 'Rajdhani', sans-serif;
+  flex-shrink: 0; /* Evita que el botón se encoja */
 }
 
 .gta-navbar {
@@ -478,13 +481,10 @@ body {
 /* Responsividad */
 @media (max-width: 768px) {
     .gta-header {
-        justify-content: space-between;
+        padding: 1rem 0.5rem; /* Reduce el padding lateral para más espacio */
     }
     .gta-title {
         font-size: 2rem;
-    }
-    .logo-container {
-        gap: 0.5rem;
     }
     .gta-navbar {
         top: 70px;
