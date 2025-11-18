@@ -541,6 +541,14 @@ body {
   background: #FF8C00;
   color: #000;
 }
+
+/* Contenedor para múltiples botones en una fila */
+.gta-button-group {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-top: 2rem;
+}
 /* Responsividad */
 @media (max-width: 768px) {
     .gta-header {
@@ -563,6 +571,29 @@ body {
     .info-column .gta-list {
       column-count: 2; /* Divide las listas largas en 2 columnas */
       column-gap: 1.5rem;
+    }
+
+    /* Ajustes para las páginas de estado (éxito/fallido) en móviles */
+    .status-container, .success-container {
+      padding: 0.5rem; /* Menos padding en móviles */
+      justify-content: flex-start; /* Alinear arriba en lugar de centrar verticalmente */
+    }
+
+    /* Hacemos la caja del comprobante más compacta en móviles */
+    .status-box, .success-box {
+      padding: 1rem; /* Reducimos el padding interno */
+    }
+
+    /* Apila los botones en las páginas de comprobantes en móviles */
+    .gta-button-group {
+      flex-direction: column; /* Cambia la dirección a vertical */
+      gap: 0.75rem; /* Reduce el espacio entre botones */
+    }
+
+    /* Reduce el tamaño del título en las páginas de éxito/fallo en móviles */
+    .success-container .gta-section-title,
+    .status-container .gta-section-title {
+      font-size: 1.8rem;
     }
 }
 
