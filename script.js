@@ -19,6 +19,14 @@ document.addEventListener('DOMContentLoaded', () => {
   // 1. ANIMACIÓN DE FONDO Y ELEMENTOS PRINCIPALES (GSAP)
   // ===============================================
 
+  // Carga inteligente de la imagen de fondo para mejorar el rendimiento
+  const bgElement = document.getElementById('gta-bg');
+  if (bgElement) {
+    const bgImageUrl = 'https://wallpaperaccess.in/public/uploads/preview/cool-gta-san-andreas-wallpaper-1920x1080.jpg';
+    bgElement.style.backgroundImage = `url(${bgImageUrl})`;
+    bgElement.style.opacity = '0.4';
+  }
+
   // Animación de movimiento sutil al fondo
   gsap.to('#gta-bg', {
     duration: 30,
@@ -45,7 +53,10 @@ document.addEventListener('DOMContentLoaded', () => {
   const navLinks = navbar ? navbar.querySelectorAll('a') : [];
 
   const toggleMenu = () => {
-    const isActive = navbar.classList.toggle('active');
+    // Usamos toggle para añadir/quitar la clase 'active'
+    const isActive = navbar.classList.toggle('active'); 
+    // Si el menú se está abriendo, aseguramos que esté visible para la transición
+    if (isActive) navbar.style.display = 'flex'; else setTimeout(() => navbar.style.display = 'none', 300); // Espera a que termine la transición para ocultar completamente
     // Cambia icono y accesibilidad
     if (menuButton) {
       menuButton.textContent = isActive ? 'X' : '☰';
@@ -60,12 +71,35 @@ document.addEventListener('DOMContentLoaded', () => {
   // Cierra el menú al hacer clic en un enlace
   navLinks.forEach(link => {
     link.addEventListener('click', () => {
-      navbar.classList.remove('active');
+      navbar.classList.remove('active'); // Elimina la clase 'active'
       if (menuButton) {
         menuButton.textContent = '☰';
         menuButton.setAttribute('aria-expanded', 'false');
       }
     });
+  });
+
+  // ===============================================
+  // 2.5. OCULTAR HEADER AL HACER SCROLL
+  // ===============================================
+  const header = document.querySelector('.gta-header');
+  let lastScrollY = window.scrollY;
+
+  window.addEventListener('scroll', () => {
+    const currentScrollY = window.scrollY;
+
+    if (currentScrollY > lastScrollY && currentScrollY > header.offsetHeight) {
+      // Scrolling down
+      header.classList.add('header-hidden');
+      // También cierra el menú si está abierto para evitar que quede flotando
+      if (navbar && navbar.classList.contains('active')) { // Añadido 'navbar &&' para seguridad
+        toggleMenu();
+      }
+    } else {
+      // Scrolling up
+      header.classList.remove('header-hidden');
+    }
+    lastScrollY = currentScrollY;
   });
 
   // ===============================================
@@ -462,20 +496,141 @@ document.addEventListener('DOMContentLoaded', () => {
     boton.addEventListener('click', () => window.open('https://discord.gg/EsgBcUCubQ', '_blank'));
   });
 
+  // ===============================================
+  // 8. LÓGICA DE SUBIDA DE IMAGEN PARA RECLAMOS
+  // ===============================================
+  const imageInput = document.getElementById('imagen-reclamo');
+  const uploadStatus = document.getElementById('upload-status');
+  const hiddenImageLink = document.getElementById('enlace-imagen-oculto');
+  const uploadProgressBar = document.getElementById('upload-progress');
+  const uploadPercentage = document.getElementById('upload-percentage');
+  const progressContainer = document.getElementById('progress-container');
+
+  if (imageInput && uploadStatus && hiddenImageLink) {
+    imageInput.addEventListener('change', async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      // 🛑 IMPORTANTE: Reemplaza con tu propia API Key de imgbb.com
+      const apiKey = '25f49b817e22362e4296cda5eb2f18b9';
+
+      if (apiKey === 'TU_API_KEY_DE_IMGBB' || !apiKey) {
+        showToast('Error: La subida de imágenes no está configurada.');
+        console.error("Por favor, añade tu API Key de imgbb.com en script.js");
+        return;
+      }
+
+      // Mostrar barra de progreso y estado
+      uploadStatus.textContent = 'Subiendo imagen...';
+      progressContainer.style.display = 'flex';
+      uploadProgressBar.value = 0;
+      uploadPercentage.textContent = '0%';
+      hiddenImageLink.value = ''; // Limpia el valor anterior
+
+      const formData = new FormData();
+      formData.append('image', file);
+
+      try {
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', `https://api.imgbb.com/1/upload?key=${apiKey}`);
+
+        // Evento de progreso de subida
+        xhr.upload.addEventListener('progress', (event) => {
+          if (event.lengthComputable) {
+            const percent = Math.round((event.loaded / event.total) * 100);
+            uploadProgressBar.value = percent;
+            uploadPercentage.textContent = `${percent}%`;
+          }
+        });
+
+        // Cuando la solicitud se completa
+        xhr.onload = () => {
+          if (xhr.status === 200) {
+            const result = JSON.parse(xhr.responseText);
+            if (result.success) {
+              hiddenImageLink.value = result.data.url;
+              uploadStatus.textContent = '✅ Imagen adjuntada con éxito.';
+              uploadProgressBar.value = 100;
+              uploadPercentage.textContent = '100%';
+            } else {
+              uploadStatus.textContent = `❌ Error al subir la imagen: ${result.error.message || 'Desconocido'}`;
+              progressContainer.style.display = 'none';
+            }
+          } else {
+            uploadStatus.textContent = `❌ Error al subir la imagen. Código: ${xhr.status}`;
+            progressContainer.style.display = 'none';
+          }
+        };
+
+        // Cuando ocurre un error de red
+        xhr.onerror = () => {
+          uploadStatus.textContent = '❌ Error de red al subir la imagen.';
+          progressContainer.style.display = 'none';
+        };
+
+        xhr.send(formData);
+      } catch (error) {
+        uploadStatus.textContent = '❌ Error de red al subir la imagen.';
+        progressContainer.style.display = 'none';
+      }
+    });
+  }
 
   // Formulario de reclamos
   const form = document.getElementById('form-reclamos');
   if (form) {
+    // Rellena el último nombre de usuario utilizado desde localStorage
+    const nombreInput = form.querySelector('#nombre');
+    const ultimoNombre = localStorage.getItem('ultimoNombreReclamo');
+    if (nombreInput && ultimoNombre) {
+      nombreInput.value = ultimoNombre;
+    }
+
     form.addEventListener('submit', async (e) => {
       e.preventDefault(); // Prevenimos el envío tradicional
+
 
       const nombre = form.querySelector('#nombre');
       const correo = form.querySelector('#correo');
       const mensaje = form.querySelector('#mensaje');
+      const discord = form.querySelector('#discord');
       const submitButton = form.querySelector('button[type="submit"]');
 
-      if (!nombre.value.trim() || !correo.value.trim() || !mensaje.value.trim()) {
-        showToast('Por favor completa todos los campos.');
+      // Validación: nombre, correo, discord y mensaje son obligatorios. La imagen es opcional.
+      if (!nombre.value.trim() || !correo.value.trim() || !mensaje.value.trim() || !discord.value.trim()) {
+        showToast('Por favor completa todos los campos obligatorios.');
+
+        return;
+      }
+
+      // Validación del formato Nombre_Apellido
+      if (!nombre.value.trim().includes('_')) {
+        showToast('El formato del nombre debe ser Nombre_Apellido.');
+        return;
+      }
+
+
+      // Validación del formato de usuario de Discord
+      const discordValue = discord.value.trim();
+      let isDiscordValid = false;
+      if (discordValue.includes('#')) {
+        // Formato antiguo: Nombre#1234
+        isDiscordValid = /^.{2,32}#\d{4}$/.test(discordValue);
+      } else {
+        // Formato nuevo: sin # (entre 2 y 32 caracteres)
+        isDiscordValid = discordValue.length >= 2 && discordValue.length <= 32;
+      }
+
+      if (!isDiscordValid) {
+        showToast('Por favor, introduce un usuario de Discord válido.');
+        return;
+      }
+
+      // Validación de número mínimo de palabras en el mensaje
+      const minPalabras = 10;
+      const palabras = mensaje.value.trim().split(/\s+/).filter(p => p.length > 0).length;
+      if (palabras < minPalabras) {
+        showToast(`La descripción del reclamo debe tener al menos ${minPalabras} palabras.`);
         return;
       }
 
@@ -483,18 +638,35 @@ document.addEventListener('DOMContentLoaded', () => {
       submitButton.disabled = true;
       submitButton.textContent = 'Enviando...';
 
+
       try {
         const formData = new FormData(form);
         const response = await fetch(form.action, {
           method: 'POST',
-          body: formData
+          body: formData,
+          headers: {
+              'Accept': 'application/json'
+          }
         });
 
         if (response.ok) {
+
+          const nombreGuardar = nombre.value.trim();
+          localStorage.setItem('ultimoNombreReclamo', nombreGuardar); // Guarda el nombre
+
           showToast('¡Reclamo enviado! El equipo de Creativos RP revisará tu caso pronto.');
           form.reset();
+
+          nombre.value = nombreGuardar; // Restaura el nombre en el campo después de resetear
+
+          // Resetea también el estado de la subida de imagen
+          if (uploadStatus) {
+            uploadStatus.textContent = '';
+            progressContainer.style.display = 'none';
+          }
         } else {
-          showToast('Hubo un error al enviar el reclamo. Inténtalo de nuevo.');
+          const errorData = await response.json().catch(() => ({ message: 'Error desconocido.' }));
+          showToast(`Error al enviar el reclamo: ${errorData.message || 'Inténtalo de nuevo.'} Por favor, verifica tu configuración en Formspree.`);
         }
       } catch (error) {
         showToast('Hubo un error de red. Por favor, revisa tu conexión.');
@@ -504,6 +676,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
   }
+
 
   // Año dinámico en footer
   const anioEl = document.getElementById('anio');
