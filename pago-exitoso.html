@@ -118,7 +118,7 @@
       // Esto es seguro porque solo se ejecuta después de un pago real.
       const IS_LOCAL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
       // 🛑 Pega aquí la URL que te dará Render en el Paso 3.
-      const RENDER_URL = 'https://creativosrp.onrender.com';
+      const RENDER_URL = 'https://creativosrp.onrender.com'; // URL de producción confirmada.
       const API_URL = IS_LOCAL ? 'http://localhost:3000' : RENDER_URL;
 
       fetch(`${API_URL}/log-purchase`, {
