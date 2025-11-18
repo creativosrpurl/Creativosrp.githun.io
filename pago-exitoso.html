@@ -14,6 +14,7 @@
 
   <!-- Librería para generar la imagen del comprobante -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" integrity="sha512-BNaRQnYJYiPSqHHDb58B0yaPfCu+Wgds8Gp/gU33kqBtgNS4tSPHuGibyoVBL5gI9kDXrdZEo8NNYCKaYHNssg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script defer src="utils.js"></script> <!-- Archivo de utilidades compartidas -->
 
   <style>
     /* Estilos específicos para esta página de éxito */
@@ -95,13 +96,7 @@
 
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      // Carga la imagen de fondo dinámicamente, igual que en index.html
-      const bgElement = document.getElementById('gta-bg');
-      if (bgElement) {
-        const bgImageUrl = 'https://wallpaperaccess.in/public/uploads/preview/cool-gta-san-andreas-wallpaper-1920x1080.jpg';
-        bgElement.style.backgroundImage = `url(${bgImageUrl})`;
-        bgElement.style.opacity = '0.4';
-      }
+      loadDynamicBackground(); // Usamos la función compartida desde utils.js
 
       const successBox = document.querySelector('.success-box');
       const urlParams = new URLSearchParams(window.location.search);
@@ -114,27 +109,27 @@
       const dateStr = urlParams.get('date');
       const orderID = urlParams.get('orderID');
 
-      // ¡NUEVO! Enviar notificación al backend en cuanto se carga la página.
-      // Esto es seguro porque solo se ejecuta después de un pago real.
-      const IS_LOCAL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-      // 🛑 Pega aquí la URL que te dará Render en el Paso 3.
-      const RENDER_URL = 'https://creativosrp.onrender.com'; // URL de producción confirmada.
-      const API_URL = IS_LOCAL ? 'http://localhost:3000' : RENDER_URL;
-
-      fetch(`${API_URL}/log-purchase`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          username: username,
-          itemName: itemName,
-          amount: amount,
-          currency: currency,
-          orderID: orderID
-        })
-      }).catch(error => {
-        console.error('No se pudo enviar la notificación de compra al servidor:', error);
-        // No es un error crítico para el usuario, por lo que no mostramos alerta.
-      });
+      // Lógica para evitar notificaciones duplicadas en Discord
+      const notificationKey = `notified_${orderID}`;
+      if (orderID && !localStorage.getItem(notificationKey)) {
+        fetch(`${API_URL}/log-purchase`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            username: username,
+            itemName: itemName,
+            amount: amount,
+            currency: currency,
+            orderID: orderID
+          })
+        }).then(() => {
+          // Si la notificación se procesa, guardamos la marca en localStorage
+          localStorage.setItem(notificationKey, 'true');
+        }).catch(error => {
+          console.error('No se pudo enviar la notificación de compra al servidor:', error);
+          // No es un error crítico para el usuario, por lo que no mostramos alerta.
+        });
+      }
 
       // Mostramos los datos en la página
       document.getElementById('display-username').textContent = username || 'jugador';
