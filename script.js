@@ -106,44 +106,43 @@ document.addEventListener('DOMContentLoaded', () => {
   // 3. ASIGNACIÓN DE INFORMACIÓN DINÁMICA (IP Y CONTADOR)
   // ===============================================
 
-  // --- CONFIGURACIÓN DEL SERVIDOR ---
-  const SERVER_IP = '45.45.237.224:7779';
-  const [SERVER_HOST, SERVER_PORT] = SERVER_IP.split(':');
-
   // Contenedor para la información del servidor
   const serverInfoContainer = document.getElementById('server-info-container');
   if (serverInfoContainer) {
-    const infoBienvenida = document.createElement('p');
-    infoBienvenida.className = 'gta-text info-asignada';
-    infoBienvenida.innerHTML = `
-      Estado: <strong><span id="jugadores-activos">--</span></strong><br> 
-      IP: <strong>${SERVER_IP}</strong> 
-      <button id="copy-ip-btn" class="gta-boton-copiar">Copiar IP</button>
-    `;
-    serverInfoContainer.appendChild(infoBienvenida);
+    // Función para obtener y mostrar la información del servidor de forma segura
+    const fetchServerInfo = async () => {
+      try {
+        const response = await fetch(`${API_URL}/server-info`);
+        if (!response.ok) throw new Error('No se pudo obtener la info del servidor.');
+        const data = await response.json();
+        const serverIp = data.serverIp;
 
-    const copyIpBtn = document.getElementById('copy-ip-btn');
-    if (copyIpBtn) {
-      copyIpBtn.addEventListener('click', () => {
-        navigator.clipboard.writeText(SERVER_IP).then(() => {
-          showToast('¡IP copiada al portapapeles!');
-          copyIpBtn.textContent = '¡Copiado!';
-          setTimeout(() => { copyIpBtn.textContent = 'Copiar IP'; }, 2000);
-        }).catch(err => showToast('Error al copiar la IP.'));
-      });
-    }
+        const infoBienvenida = document.createElement('p');
+        infoBienvenida.className = 'gta-text info-asignada';
+        infoBienvenida.innerHTML = `
+          Estado: <strong><span id="jugadores-activos">Activo</span></strong><br> 
+          IP: <strong>${serverIp}</strong> 
+          <button id="copy-ip-btn" class="gta-boton-copiar">Copiar IP</button>
+        `;
+        serverInfoContainer.innerHTML = ''; // Limpia el contenedor
+        serverInfoContainer.appendChild(infoBienvenida);
 
-    const jugadoresActivosEl = document.getElementById('jugadores-activos');
-
-    // Función simplificada para mostrar siempre "Activo"
-    function actualizarJugadores() {
-      if (jugadoresActivosEl) {
-        jugadoresActivosEl.textContent = 'Activo';
+        const copyIpBtn = document.getElementById('copy-ip-btn');
+        if (copyIpBtn) {
+          copyIpBtn.addEventListener('click', () => {
+            navigator.clipboard.writeText(serverIp).then(() => {
+              showToast('¡IP copiada al portapapeles!');
+              copyIpBtn.textContent = '¡Copiado!';
+              setTimeout(() => { copyIpBtn.textContent = 'Copiar IP'; }, 2000);
+            }).catch(err => showToast('Error al copiar la IP.'));
+          });
+        }
+      } catch (error) {
+        serverInfoContainer.innerHTML = `<p class="gta-text info-asignada">No se pudo cargar la información del servidor.</p>`;
       }
-    }
+    };
 
-    // Actualiza al cargar y cada 60s
-    actualizarJugadores(); // Llama a la función una vez para establecer el texto.
+    fetchServerInfo();
   }
 
   // ===============================================
@@ -225,6 +224,16 @@ document.addEventListener('DOMContentLoaded', () => {
   const nequiPackageLabel = document.querySelector('label[for="nequi-coin-package"]');
   const nequiAmountDisplay = document.getElementById('nequi-amount-display');
 
+  // Elementos del código promocional
+  const promoCodePaypalInput = document.getElementById('promo-code-paypal');
+  const applyPromoPaypalBtn = document.getElementById('apply-promo-paypal');
+  const promoStatusPaypal = document.getElementById('promo-status-paypal');
+  const promoCodeNequiInput = document.getElementById('promo-code-nequi');
+  const applyPromoNequiBtn = document.getElementById('apply-promo-nequi');
+  const promoStatusNequi = document.getElementById('promo-status-nequi');
+
+  let appliedDiscount = null; // Guarda el descuento aplicado
+
   // Limpia el resaltado de error al escribir en el campo de usuario de la tienda
   if (sampUsernameInput) {
     sampUsernameInput.addEventListener('input', () => {
@@ -252,6 +261,9 @@ document.addEventListener('DOMContentLoaded', () => {
       paypalStep.hidden = true;
       nequiStep.hidden = true;
       purchaseModal.hidden = false;
+      // Resetea el descuento y los campos de promo al abrir el modal
+      appliedDiscount = null;
+      resetPromoFields();
 
       if (purchaseType === 'coins') {
         modalTitle.textContent = 'Comprar Coins';
@@ -293,6 +305,7 @@ document.addEventListener('DOMContentLoaded', () => {
     selectPaypalBtn.addEventListener('click', () => {
       paymentMethodStep.hidden = true;
       paypalStep.hidden = false;
+      appliedDiscount = null; // Resetea descuento al cambiar de método
       renderPayPalButton(paypal.FUNDING.PAYPAL); // Muestra solo el botón de PayPal
     });
   }
@@ -302,6 +315,7 @@ document.addEventListener('DOMContentLoaded', () => {
     selectCardBtn.addEventListener('click', () => {
       paymentMethodStep.hidden = true;
       paypalStep.hidden = false;
+      appliedDiscount = null; // Resetea descuento al cambiar de método
       renderPayPalButton(paypal.FUNDING.CARD); // Muestra solo el botón de Tarjeta
     });
   }
@@ -310,6 +324,7 @@ document.addEventListener('DOMContentLoaded', () => {
     selectNequiBtn.addEventListener('click', () => {
       paymentMethodStep.hidden = true;
       nequiStep.hidden = false;
+      appliedDiscount = null; // Resetea descuento al cambiar de método
 
       // Si es una casa, ajusta el precio de Nequi directamente
       if (currentPurchase === 'house') {
@@ -377,6 +392,10 @@ document.addEventListener('DOMContentLoaded', () => {
     paymentMethodStep.hidden = false;
     paypalStep.hidden = true;
     nequiStep.hidden = true;
+    // Resetea el descuento y los campos
+    appliedDiscount = null;
+    resetPromoFields();
+
     // Limpia el contenedor de botones de PayPal para evitar errores si se vuelve a entrar
     const paypalButtonContainer = document.getElementById('paypal-button-container');
     if (paypalButtonContainer) {
@@ -389,6 +408,9 @@ document.addEventListener('DOMContentLoaded', () => {
   // Cerrar el modal
   const closeModal = () => {
     const purchaseForm = document.getElementById('purchase-form');
+    // Resetea el descuento y los campos
+    appliedDiscount = null;
+    resetPromoFields();
     // Limpia el campo de usuario también al cerrar
     if (sampUsernameInput) sampUsernameInput.classList.remove('gta-input-error');
     if (purchaseForm) purchaseForm.reset();
@@ -463,12 +485,18 @@ document.addEventListener('DOMContentLoaded', () => {
           itemName = selectedOption.dataset.name;
         }
 
-        showToast(`Creando orden para ${itemName} (${username})...`);
+        // Aplicar descuento si existe
+        let finalAmount = parseFloat(amount);
+        if (appliedDiscount) {
+          finalAmount = calculateDiscountedPrice(finalAmount, appliedDiscount);
+        }
+
+        showToast(`Creando orden para ${itemName}...`);
 
         return actions.order.create({
           purchase_units: [{
             amount: {
-              value: amount
+              value: finalAmount.toFixed(2)
             },
             description: `${itemName} para SA-MP usuario: ${username}`,
             custom_id: username // Usamos custom_id para pasar el nombre de usuario
@@ -562,6 +590,134 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // ===============================================
+  // 7.5 LÓGICA DE CÓDIGOS PROMOCIONALES
+  // ===============================================
+
+  // URL de nuestro nuevo servidor seguro.
+  // ¡MEJORA DE MANTENIMIENTO! Esta lógica detecta si estás en tu PC (localhost)
+  // o en el servidor real (Render), y usa la URL correcta automáticamente.
+  const IS_LOCAL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+  // 🛑 RECUERDA REEMPLAZAR LA URL de Render cuando la tengas.
+  const RENDER_URL = 'https://creativos-rp-server.onrender.com'; // <-- ¡URL REAL DE RENDER PEGADA AQUÍ!
+  const API_URL = IS_LOCAL ? 'http://localhost:3000' : RENDER_URL;
+
+  console.log(`Modo: ${IS_LOCAL ? 'Desarrollo Local' : 'Producción'}. API en: ${API_URL}`);
+
+  const calculateDiscountedPrice = (originalPrice, discount) => {
+    let finalPrice = parseFloat(originalPrice);
+    if (discount.type === 'percent') {
+      finalPrice *= (1 - discount.value / 100);
+    } else if (discount.type === 'fixed') {
+      finalPrice -= discount.value;
+    }
+    // Si el descuento es del 100%, el precio es 0. Si no, el mínimo es 0.01.
+    if (discount.value === 100 && discount.type === 'percent') {
+      return 0;
+    }
+    return Math.max(0.01, finalPrice);
+  };
+
+  const applyPromoCode = async (inputElement, statusElement) => {
+    const code = inputElement.value.trim().toUpperCase();
+    const username = sampUsernameInput.value.trim();
+
+    try {
+      const response = await fetch(`${API_URL}/validate-promo`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code, username }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Error del servidor');
+      }
+
+      // Si el código es 100% de descuento (gratis)
+      if (data.discount.type === 'percent' && data.discount.value === 100) {
+        let itemName;
+        if (currentPurchase === 'house') itemName = 'Casa Privada';
+        else if (currentPurchase === 'empresa') itemName = 'Empresa';
+        else itemName = coinPackageSelect.options[coinPackageSelect.selectedIndex].dataset.name;
+
+        statusElement.textContent = '¡Código gratuito aplicado! Redirigiendo...';
+        statusElement.style.color = '#32CD32';
+        statusElement.style.display = 'block';
+
+        setTimeout(() => {
+          window.location.href = `pago-exitoso.html?username=${encodeURIComponent(data.receiptUsername)}&itemName=${encodeURIComponent(itemName)}&amount=0.00&currency=USD&date=${new Date().toISOString()}&orderID=GRATIS-${new Date().getTime()}`;
+        }, 2000);
+        return;
+      }
+
+      // Para otros descuentos
+      appliedDiscount = data.discount;
+      statusElement.textContent = `¡Código aplicado! ${appliedDiscount.value}${appliedDiscount.type === 'percent' ? '%' : ' USD'} de descuento.`;
+      statusElement.style.color = '#32CD32'; // Verde
+      statusElement.style.display = 'block';
+
+      if (paypalStep.hidden === false) {
+        const activeFunding = document.querySelector('#paypal-button-container iframe') ? (document.querySelector('#paypal-button-container iframe').src.includes('card') ? paypal.FUNDING.CARD : paypal.FUNDING.PAYPAL) : paypal.FUNDING.PAYPAL;
+        renderPayPalButton(activeFunding);
+      }
+      if (nequiStep.hidden === false) {
+        updateNequiPrice();
+      }
+
+    } catch (error) {
+      appliedDiscount = null;
+      statusElement.textContent = error.message;
+      statusElement.style.color = '#d9534f'; // Rojo
+      statusElement.style.display = 'block';
+    }
+  };
+
+  const updateNequiPrice = () => {
+    let originalAmountCOP;
+    if (currentPurchase === 'house') {
+      originalAmountCOP = 24000;
+    } else if (currentPurchase === 'empresa') {
+      originalAmountCOP = 60000;
+    } else {
+      originalAmountCOP = parseFloat(nequiPackageSelect.value);
+    }
+
+    let finalAmountCOP = originalAmountCOP;
+    if (appliedDiscount) {
+      // Convertimos el descuento a COP (aproximado, ajusta el ratio si es necesario)
+      const usdToCopRate = 4000; // Ojo: Tasa de cambio fija.
+      if (appliedDiscount.type === 'percent') {
+        finalAmountCOP *= (1 - appliedDiscount.value / 100);
+      } else if (appliedDiscount.type === 'fixed') {
+        finalAmountCOP -= (appliedDiscount.value * usdToCopRate);
+      }
+    }
+
+    finalAmountCOP = Math.max(100, Math.round(finalAmountCOP / 100) * 100); // Redondea al 100 más cercano, mínimo 100 COP
+    const formattedAmount = new Intl.NumberFormat('es-CO').format(finalAmountCOP);
+    const displayStrongTag = nequiAmountDisplay.querySelector('strong');
+    if (displayStrongTag) displayStrongTag.textContent = `$${formattedAmount} COP`;
+  };
+
+  if (applyPromoPaypalBtn) {
+    applyPromoPaypalBtn.addEventListener('click', () => applyPromoCode(promoCodePaypalInput, promoStatusPaypal));
+  }
+  if (applyPromoNequiBtn) {
+    applyPromoNequiBtn.addEventListener('click', () => applyPromoCode(promoCodeNequiInput, promoStatusNequi));
+  }
+  if (nequiPackageSelect) {
+    nequiPackageSelect.addEventListener('change', updateNequiPrice);
+  }
+
+  const resetPromoFields = () => {
+    if (promoCodePaypalInput) promoCodePaypalInput.value = '';
+    if (promoStatusPaypal) promoStatusPaypal.style.display = 'none';
+    if (promoCodeNequiInput) promoCodeNequiInput.value = '';
+    if (promoStatusNequi) promoStatusNequi.style.display = 'none';
+  };
+
 
   // Lógica para los botones de compra por Discord
   document.querySelectorAll('.gta-boton-discord').forEach(boton => {
@@ -584,15 +740,16 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!file) return;
 
       // 🛑 IMPORTANTE: Reemplaza con tu propia API Key de imgbb.com
-      const apiKey = '25f49b817e22362e4296cda5eb2f18b9';
-
-      if (apiKey === 'TU_API_KEY_DE_IMGBB' || !apiKey) {
-        showToast('Error: La subida de imágenes no está configurada.');
-        console.error("Por favor, añade tu API Key de imgbb.com en script.js");
-        return;
-      }
-
-      // Mostrar barra de progreso y estado
+    // Ahora obtenemos la clave de forma segura desde nuestro servidor
+    let apiKey;
+    try {
+      const response = await fetch(`${API_URL}/imgbb-key`);
+      const data = await response.json();
+      apiKey = data.apiKey;
+    } catch (error) {
+      showToast('Error: No se pudo conectar con el servicio de subida de imágenes.');
+      return;
+    }
       uploadStatus.textContent = 'Subiendo imagen...';
       progressContainer.style.display = 'flex';
       uploadProgressBar.value = 0;
