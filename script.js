@@ -19,13 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // 1. ANIMACIÓN DE FONDO Y ELEMENTOS PRINCIPALES (GSAP)
   // ===============================================
 
-  // Carga inteligente de la imagen de fondo para mejorar el rendimiento
-  const bgElement = document.getElementById('gta-bg');
-  if (bgElement) {
-    const bgImageUrl = 'https://wallpaperaccess.in/public/uploads/preview/cool-gta-san-andreas-wallpaper-1920x1080.jpg';
-    bgElement.style.backgroundImage = `url(${bgImageUrl})`;
-    bgElement.style.opacity = '0.4';
-  }
+  loadDynamicBackground(); // Usamos la función compartida desde utils.js
 
   // Animación de movimiento sutil al fondo
   gsap.to('#gta-bg', {
@@ -109,37 +103,44 @@ document.addEventListener('DOMContentLoaded', () => {
   // Contenedor para la información del servidor
   const serverInfoContainer = document.getElementById('server-info-container');
   if (serverInfoContainer) {
-    // Función para obtener y mostrar la información del servidor de forma segura
-    const fetchServerInfo = async () => {
-      try {
-        const response = await fetch(`${API_URL}/server-info`);
-        if (!response.ok) throw new Error('No se pudo obtener la info del servidor.');
-        const data = await response.json();
-        const serverIp = data.serverIp;
+    // Función para obtener y mostrar la información del servidor con reintentos
+    const fetchServerInfo = async (retries = 5, delay = 3000) => { // Aumentamos a 5 reintentos y 3s de espera
+      for (let i = 1; i <= retries; i++) {
+        try {
+          const response = await fetch(`${API_URL}/server-info`);
+          if (!response.ok) throw new Error(`Respuesta no válida del servidor: ${response.status}`);
+          
+          const data = await response.json();
+          const serverIp = data.serverIp;
 
-        const infoBienvenida = document.createElement('p');
-        infoBienvenida.className = 'gta-text info-asignada';
-        infoBienvenida.innerHTML = `
-          Estado: <strong><span id="jugadores-activos">Activo</span></strong><br> 
-          IP: <strong>${serverIp}</strong> 
-          <button id="copy-ip-btn" class="gta-boton-copiar">Copiar IP</button>
-        `;
-        serverInfoContainer.innerHTML = ''; // Limpia el contenedor
-        serverInfoContainer.appendChild(infoBienvenida);
+          const infoBienvenida = document.createElement('p');
+          infoBienvenida.className = 'gta-text info-asignada';
+          infoBienvenida.innerHTML = `
+            Estado: <strong><span id="jugadores-activos">Activo</span></strong><br> 
+            IP: <strong>${serverIp}</strong> 
+            <button id="copy-ip-btn" class="gta-boton-copiar">Copiar IP</button>
+          `;
+          serverInfoContainer.innerHTML = ''; // Limpia el contenedor
+          serverInfoContainer.appendChild(infoBienvenida);
 
-        const copyIpBtn = document.getElementById('copy-ip-btn');
-        if (copyIpBtn) {
-          copyIpBtn.addEventListener('click', () => {
-            navigator.clipboard.writeText(serverIp).then(() => {
-              showToast('¡IP copiada al portapapeles!');
-              copyIpBtn.textContent = '¡Copiado!';
-              setTimeout(() => { copyIpBtn.textContent = 'Copiar IP'; }, 2000);
-            }).catch(err => showToast('Error al copiar la IP.'));
-          });
+          const copyIpBtn = document.getElementById('copy-ip-btn');
+          if (copyIpBtn) {
+            copyIpBtn.addEventListener('click', () => {
+              navigator.clipboard.writeText(serverIp).then(() => {
+                showToast('¡IP copiada al portapapeles!');
+                copyIpBtn.textContent = '¡Copiado!';
+                setTimeout(() => { copyIpBtn.textContent = 'Copiar IP'; }, 2000);
+              }).catch(err => showToast('Error al copiar la IP.'));
+            });
+          }
+          return; // Si tiene éxito, salimos de la función.
+        } catch (error) {
+          console.warn(`Intento ${i} de ${retries} fallido. Reintentando en ${delay / 1000}s...`);
+          if (i < retries) await new Promise(res => setTimeout(res, delay));
         }
-      } catch (error) {
-        serverInfoContainer.innerHTML = `<p class="gta-text info-asignada">No se pudo cargar la información del servidor.</p>`;
       }
+      // Si todos los reintentos fallan, muestra el mensaje de error.
+      serverInfoContainer.innerHTML = `<p class="gta-text info-asignada">No se pudo cargar la información del servidor.</p>`;
     };
 
     fetchServerInfo();
@@ -593,14 +594,6 @@ document.addEventListener('DOMContentLoaded', () => {
   // ===============================================
   // 7.5 LÓGICA DE CÓDIGOS PROMOCIONALES
   // ===============================================
-
-  // URL de nuestro nuevo servidor seguro.
-  // ¡MEJORA DE MANTENIMIENTO! Esta lógica detecta si estás en tu PC (localhost)
-  // o en el servidor real (Render), y usa la URL correcta automáticamente.
-  const IS_LOCAL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-  // 🛑 RECUERDA REEMPLAZAR LA URL de Render cuando la tengas.
-  const RENDER_URL = 'https://creativosrp.onrender.com'; // URL de producción confirmada.
-  const API_URL = IS_LOCAL ? 'http://localhost:3000' : RENDER_URL;
 
   console.log(`Modo: ${IS_LOCAL ? 'Desarrollo Local' : 'Producción'}. API en: ${API_URL}`);
 
