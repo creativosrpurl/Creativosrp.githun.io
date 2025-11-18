@@ -186,9 +186,12 @@
 
         // Usamos html2canvas para "fotografiar" el div del comprobante
         html2canvas(successBox, {
-          backgroundColor: '#000', // Fondo negro para la captura
+          backgroundColor: '#1a1a1a', // Un fondo oscuro para la captura
           scale: 2, // Aumenta la resolución de la imagen
-          useCORS: true // Permite cargar imágenes de otros dominios (como el fondo)
+          useCORS: true, // Permite cargar imágenes de otros dominios (si las hubiera)
+          allowTaint: true, // Mejora la compatibilidad con recursos externos
+          logging: true, // Activa los registros en la consola para depurar
+          foreignObjectRendering: false // Evita un método de renderizado que puede ser lento
         }).then(canvas => {
           clearTimeout(generationTimeout); // Si funciona, cancelamos el timeout
 
