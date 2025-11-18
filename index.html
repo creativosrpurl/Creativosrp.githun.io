@@ -251,6 +251,13 @@
           </form>
           <label for="samp-username" class="gta-label" style="margin-top: 1rem;">Nombre de usuario en SA-MP:</label>
           <input id="samp-username" type="text" placeholder="TuNombre_Apellido" class="gta-input" required>
+          <!-- Sección de Código Promocional -->
+          <div class="promo-code-container" style="margin-top: 1rem; display: flex; gap: 0.5rem;">
+            <input id="promo-code-paypal" type="text" placeholder="Código promocional" class="gta-input" style="margin: 0; flex-grow: 1;">
+            <button id="apply-promo-paypal" type="button" class="gta-boton" style="margin: 0;">Aplicar</button>
+          </div>
+          <p id="promo-status-paypal" class="gta-text" style="font-size: 0.9em; margin-top: 0.5rem; display: none;"></p>
+
           <div id="paypal-button-container" style="margin-top: 1rem;"></div>
         </div>
 
@@ -266,6 +273,13 @@
             <option value="35000">50 Coins - $35,000 COP</option>
             <option value="65000">100 Coins - $65,000 COP</option>
           </select>
+          <!-- Sección de Código Promocional para Nequi -->
+          <div class="promo-code-container" style="margin-top: 1rem; display: flex; gap: 0.5rem;">
+            <input id="promo-code-nequi" type="text" placeholder="Código promocional" class="gta-input" style="margin: 0; flex-grow: 1;">
+            <button id="apply-promo-nequi" type="button" class="gta-boton" style="margin: 0;">Aplicar</button>
+          </div>
+          <p id="promo-status-nequi" class="gta-text" style="font-size: 0.9em; margin-top: 0.5rem; display: none;"></p>
+
           <p id="nequi-amount-display" class="gta-text info-asignada" style="margin-top: 1rem;">Monto a enviar: <strong>$4,000 COP</strong></p>
           <picture>
             <source srcset="logos/codigo qr.webp" type="image/webp">
