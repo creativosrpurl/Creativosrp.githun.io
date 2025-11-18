@@ -207,6 +207,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // ===============================================
   const purchaseModal = document.getElementById('purchase-modal');
   const buyCoinsBtn = document.getElementById('buy-coins-btn');
+  const buyEmpresaBtn = document.getElementById('buy-empresa-btn');
   const buyHouseBtn = document.getElementById('buy-house-btn');
   const closeModalBtn = document.getElementById('close-modal-btn');
   const modalTitle = document.getElementById('titulo-modal');
@@ -224,8 +225,18 @@ document.addEventListener('DOMContentLoaded', () => {
   const nequiPackageLabel = document.querySelector('label[for="nequi-coin-package"]');
   const nequiAmountDisplay = document.getElementById('nequi-amount-display');
 
+  // Limpia el resaltado de error al escribir en el campo de usuario de la tienda
+  if (sampUsernameInput) {
+    sampUsernameInput.addEventListener('input', () => {
+      if (sampUsernameInput.classList.contains('gta-input-error')) {
+        sampUsernameInput.classList.remove('gta-input-error');
+      }
+    });
+  }
+
   // Botones de selección
   const selectPaypalBtn = document.getElementById('select-paypal-btn');
+  const selectCardBtn = document.getElementById('select-card-btn');
   const selectNequiBtn = document.getElementById('select-nequi-btn');
 
   // Variable para saber qué se está comprando
@@ -255,11 +266,22 @@ document.addEventListener('DOMContentLoaded', () => {
         if (nequiPackageSelect) nequiPackageSelect.style.display = 'none';
         if (nequiPackageLabel) nequiPackageLabel.style.display = 'none';
       }
+      else if (purchaseType === 'empresa') {
+        modalTitle.textContent = 'Comprar Empresa';
+        if (coinPackageSelect) coinPackageSelect.style.display = 'none';
+        if (coinPackageLabel) coinPackageLabel.style.display = 'none';
+        if (nequiPackageSelect) nequiPackageSelect.style.display = 'none';
+        if (nequiPackageLabel) nequiPackageLabel.style.display = 'none';
+      }
     }
   };
 
   if (buyCoinsBtn) {
     buyCoinsBtn.addEventListener('click', () => openModal('coins'));
+  }
+
+  if (buyEmpresaBtn) {
+    buyEmpresaBtn.addEventListener('click', () => openModal('empresa'));
   }
 
   if (buyHouseBtn) {
@@ -271,7 +293,16 @@ document.addEventListener('DOMContentLoaded', () => {
     selectPaypalBtn.addEventListener('click', () => {
       paymentMethodStep.hidden = true;
       paypalStep.hidden = false;
-      renderPayPalButton();
+      renderPayPalButton(paypal.FUNDING.PAYPAL); // Muestra solo el botón de PayPal
+    });
+  }
+
+  // Lógica para el botón de Tarjeta de Débito/Crédito
+  if (selectCardBtn) {
+    selectCardBtn.addEventListener('click', () => {
+      paymentMethodStep.hidden = true;
+      paypalStep.hidden = false;
+      renderPayPalButton(paypal.FUNDING.CARD); // Muestra solo el botón de Tarjeta
     });
   }
 
@@ -284,6 +315,11 @@ document.addEventListener('DOMContentLoaded', () => {
       if (currentPurchase === 'house') {
         const housePriceCOP = 24000; // $6 USD a COP (aprox)
         const formattedAmount = new Intl.NumberFormat('es-CO').format(housePriceCOP);
+        const displayStrongTag = nequiAmountDisplay.querySelector('strong');
+        if (displayStrongTag) displayStrongTag.textContent = `$${formattedAmount} COP`;
+      } else if (currentPurchase === 'empresa') {
+        const empresaPriceCOP = 60000; // $15 USD a COP (aprox)
+        const formattedAmount = new Intl.NumberFormat('es-CO').format(empresaPriceCOP);
         const displayStrongTag = nequiAmountDisplay.querySelector('strong');
         if (displayStrongTag) displayStrongTag.textContent = `$${formattedAmount} COP`;
       } else {
@@ -354,6 +390,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const closeModal = () => {
     const purchaseForm = document.getElementById('purchase-form');
     // Limpia el campo de usuario también al cerrar
+    if (sampUsernameInput) sampUsernameInput.classList.remove('gta-input-error');
     if (purchaseForm) purchaseForm.reset();
     if (purchaseModal) purchaseModal.hidden = true;
   };
@@ -366,7 +403,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // Función para renderizar el botón de PayPal
-  function renderPayPalButton() {
+  function renderPayPalButton(fundingSource) {
     const paypalButtonContainer = document.getElementById('paypal-button-container');
     // Limpia el contenedor antes de renderizar para evitar duplicados
     if (!paypalButtonContainer) return console.warn('Contenedor de PayPal no encontrado.');
@@ -378,23 +415,38 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
+    const isCard = fundingSource === paypal.FUNDING.CARD;
+
     paypal.Buttons({
+      fundingSource: fundingSource, // Aquí está la clave: especifica qué botón renderizar
+      disableFunding: isCard ? 'paypal' : 'card', // Deshabilita la otra opción para evitar confusiones
       style: {
         layout: 'vertical',
-        color: 'gold',
+        color:  isCard ? 'black' : 'gold', // Negro para tarjeta, dorado para PayPal
         shape: 'rect',
-        label: 'paypal'
+        label: isCard ? 'pay' : 'paypal', // 'Pagar' para tarjeta, 'PayPal' para el otro
+        tagline: false // Opcional: quitar el tagline para un look más limpio
       },
-      createOrder: function(data, actions) {
-        if (!sampUsernameInput) {
-          throw new Error('Elementos del formulario no encontrados.');
-        }
+      onClick: function(data, actions) {
         const username = sampUsernameInput.value.trim();
         if (!username) {
           showToast('Por favor, introduce tu nombre de usuario de SA-MP.');
-          // Evita que la orden se cree si el nombre de usuario está vacío
-          throw new Error('Nombre de usuario de SA-MP requerido.');
+          highlightError(sampUsernameInput);
+          sampUsernameInput.focus();
+          return actions.reject();
         }
+        // Validación del formato Nombre_Apellido
+        const usernameRegex = /^[a-zA-Z0-9]+_[a-zA-Z0-9]+$/;
+        if (!usernameRegex.test(username)) {
+          showToast('El formato debe ser Nombre_Apellido, con texto antes y después del guion bajo.');
+          highlightError(sampUsernameInput);
+          sampUsernameInput.focus();
+          return actions.reject();
+        }
+        return actions.resolve();
+      },
+      createOrder: function(data, actions) {
+        const username = sampUsernameInput.value.trim();
 
         let amount;
         let itemName;
@@ -402,6 +454,9 @@ document.addEventListener('DOMContentLoaded', () => {
         if (currentPurchase === 'house') {
           amount = '6.00';
           itemName = 'Casa Privada';
+        } else if (currentPurchase === 'empresa') {
+          amount = '15.00';
+          itemName = 'Empresa';
         } else { // 'coins'
           const selectedOption = coinPackageSelect.options[coinPackageSelect.selectedIndex];
           amount = selectedOption.value;
@@ -434,6 +489,8 @@ document.addEventListener('DOMContentLoaded', () => {
           let itemName;
           if (currentPurchase === 'house') {
             itemName = 'Casa Privada';
+          } else if (currentPurchase === 'empresa') {
+            itemName = 'Empresa';
           } else {
             const selectedOption = coinPackageSelect.options[coinPackageSelect.selectedIndex];
             itemName = selectedOption.dataset.name;
@@ -450,6 +507,9 @@ document.addEventListener('DOMContentLoaded', () => {
           if (currentPurchase === 'house') {
             itemName = 'Casa Privada';
             amount = '6.00';
+          } else if (currentPurchase === 'empresa') {
+            itemName = 'Empresa';
+            amount = '15.00';
           } else {
             const selectedOption = coinPackageSelect.options[coinPackageSelect.selectedIndex];
             itemName = selectedOption.dataset.name;
@@ -473,6 +533,9 @@ document.addEventListener('DOMContentLoaded', () => {
         if (currentPurchase === 'house') {
           itemName = 'Casa Privada';
           amount = '6.00';
+        } else if (currentPurchase === 'empresa') {
+          itemName = 'Empresa';
+          amount = '15.00';
         } else {
           const selectedOption = coinPackageSelect.options[coinPackageSelect.selectedIndex];
           itemName = selectedOption.dataset.name;
@@ -487,7 +550,16 @@ document.addEventListener('DOMContentLoaded', () => {
         // Redirige a la página de pago fallido si hay un error general
         window.location.href = `pago-fallido.html?reason=error`;
       }
-    }).render('#paypal-button-container'); // Renderiza el botón en el div
+    })
+    .render('#paypal-button-container')
+    .catch((err) => {
+      console.error('Error al renderizar botones de PayPal:', err);
+      let errorMessage = 'Error al inicializar el método de pago.';
+      if (fundingSource === paypal.FUNDING.CARD) {
+        errorMessage += ' Asegúrate de que tu cuenta de PayPal Business tenga activados los pagos avanzados con tarjeta.';
+      }
+      paypalButtonContainer.innerHTML = `<p style="color: #FF8C00;">${errorMessage}</p>`;
+    });
   }
 
 
@@ -576,6 +648,12 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // Función reutilizable para resaltar errores
+  const highlightError = (element) => {
+    element.classList.add('gta-input-error');
+    element.addEventListener('input', () => element.classList.remove('gta-input-error'), { once: true });
+  };
+
   // Formulario de reclamos
   const form = document.getElementById('form-reclamos');
   if (form) {
@@ -596,16 +674,22 @@ document.addEventListener('DOMContentLoaded', () => {
       const discord = form.querySelector('#discord');
       const submitButton = form.querySelector('button[type="submit"]');
 
+      // Limpia errores previos
+      form.querySelectorAll('.gta-input-error').forEach(el => el.classList.remove('gta-input-error'));
+
       // Validación: nombre, correo, discord y mensaje son obligatorios. La imagen es opcional.
       if (!nombre.value.trim() || !correo.value.trim() || !mensaje.value.trim() || !discord.value.trim()) {
         showToast('Por favor completa todos los campos obligatorios.');
-
+        [nombre, correo, mensaje, discord].forEach(el => {
+          if (!el.value.trim()) highlightError(el);
+        });
         return;
       }
 
       // Validación del formato Nombre_Apellido
       if (!nombre.value.trim().includes('_')) {
         showToast('El formato del nombre debe ser Nombre_Apellido.');
+        highlightError(nombre);
         return;
       }
 
@@ -623,6 +707,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       if (!isDiscordValid) {
         showToast('Por favor, introduce un usuario de Discord válido.');
+        highlightError(discord);
         return;
       }
 
@@ -631,6 +716,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const palabras = mensaje.value.trim().split(/\s+/).filter(p => p.length > 0).length;
       if (palabras < minPalabras) {
         showToast(`La descripción del reclamo debe tener al menos ${minPalabras} palabras.`);
+        highlightError(mensaje);
         return;
       }
 
