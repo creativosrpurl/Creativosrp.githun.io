@@ -525,7 +525,10 @@ document.addEventListener('DOMContentLoaded', () => {
             itemName = selectedOption.dataset.name;
           }
 
-          window.location.href = `pago-exitoso.html?username=${encodeURIComponent(username)}&itemName=${encodeURIComponent(itemName)}&amount=${amount}&currency=${currency}&date=${transactionDate}&orderID=${data.orderID}`;
+          // Añadimos el código promocional a la URL si se usó uno
+          const promoCodeParam = appliedDiscount ? `&promoCode=${appliedDiscount.code}` : '';
+
+          window.location.href = `pago-exitoso.html?username=${encodeURIComponent(username)}&itemName=${encodeURIComponent(itemName)}&amount=${amount}&currency=${currency}&date=${transactionDate}&orderID=${data.orderID}${promoCodeParam}`;
         }).catch(function(error) {
           // --- PAGO FALLIDO (EJ. FONDOS INSUFICIENTES) ---
           console.error('Error al capturar el pago:', error);
@@ -646,7 +649,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       // Para otros descuentos
-      appliedDiscount = data.discount;
+      appliedDiscount = { ...data.discount, code: code }; // Guardamos el objeto y el código
       statusElement.textContent = `¡Código aplicado! ${appliedDiscount.value}${appliedDiscount.type === 'percent' ? '%' : ' USD'} de descuento.`;
       statusElement.style.color = '#32CD32'; // Verde
       statusElement.style.display = 'block';
