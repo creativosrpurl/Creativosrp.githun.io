@@ -599,7 +599,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // o en el servidor real (Render), y usa la URL correcta automáticamente.
   const IS_LOCAL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
   // 🛑 RECUERDA REEMPLAZAR LA URL de Render cuando la tengas.
-  const RENDER_URL = 'https://creativos-rp-server.onrender.com'; // <-- ¡URL REAL DE RENDER PEGADA AQUÍ!
+  const RENDER_URL = 'https://creativosrp.onrender.com';
   const API_URL = IS_LOCAL ? 'http://localhost:3000' : RENDER_URL;
 
   console.log(`Modo: ${IS_LOCAL ? 'Desarrollo Local' : 'Producción'}. API en: ${API_URL}`);
