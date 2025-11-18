@@ -1,0 +1,11 @@
+# Dependencias de Node.js - Esta carpeta se genera automáticamente.
+# ¡NUNCA subir esta carpeta a GitHub!
+/node_modules
+
+# Archivos de variables de entorno locales (buenas prácticas)
+.env
+
+# Registros de errores y depuración
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*

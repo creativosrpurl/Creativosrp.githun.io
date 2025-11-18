@@ -1,0 +1,19 @@
+{
+  "name": "creativos-rp-backend",
+  "version": "1.0.0",
+  "description": "Servidor seguro para la tienda de Creativos RP",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "author": "Mr Beast",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "discord.js": "^14.7.1"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
