@@ -357,6 +357,14 @@ body {
   background-color: #222;
   color: #FFFFFF;
   font-family: 'Rajdhani', sans-serif;
+  transition: border-color 0.3s, box-shadow 0.3s; /* Transición para el resaltado de error */
+}
+
+/* Estilo para resaltar campos con errores */
+.gta-input-error {
+  border: 2px solid #FF4500 !important; /* Borde más grueso y rojo brillante */
+  box-shadow: 0 0 10px rgba(255, 69, 0, 0.7) !important; /* Resplandor más intenso */
+  padding: calc(0.7rem - 1px); /* Ajusta el padding para compensar el borde más grueso */
 }
 
 .gta-input::placeholder, .gta-textarea::placeholder {
@@ -513,6 +521,7 @@ body {
   display: flex;
   justify-content: center;
   gap: 1rem;
+  flex-wrap: wrap; /* Asegura que los botones se ajusten en pantallas pequeñas */
   margin-top: 1rem;
 }
 
