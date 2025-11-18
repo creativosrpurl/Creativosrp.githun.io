@@ -108,6 +108,7 @@
       const currency = urlParams.get('currency');
       const dateStr = urlParams.get('date');
       const orderID = urlParams.get('orderID');
+      const promoCode = urlParams.get('promoCode'); // Leemos el código promocional
 
       // Lógica para evitar notificaciones duplicadas en Discord
       const notificationKey = `notified_${orderID}`;
@@ -120,7 +121,8 @@
             itemName: itemName,
             amount: amount,
             currency: currency,
-            orderID: orderID
+            orderID: orderID,
+            promoCode: promoCode // Lo enviamos al servidor
           })
         }).then(() => {
           // Si la notificación se procesa, guardamos la marca en localStorage
