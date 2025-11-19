@@ -367,35 +367,3 @@
   </script>
 </body>
 </html>
-            drawReceipt(); // Ahora sí, dibujamos todo
-          };
-          
-          // Manejo de error si el logo no carga
-          logo.onerror = () => {
-            alert('No se pudo cargar el logo para el comprobante, pero la descarga continuará.');
-            // Si el logo falla, calculamos la altura y dibujamos sin él
-            let tempY = padding;
-            tempY += logoSize + lineSpacing; // Espacio que ocuparía el logo
-            tempY += lineSpacing + lineHeight; // Divisor
-            tempY += 70; // Título
-            tempY += 90; // Facturado a
-            tempY += data.length * (lineHeight + lineSpacing); // Detalles de la transacción
-            tempY += lineSpacing * 2; // Espacio antes de pasos
-            tempY += lineHeight; // Título de pasos
-            tempY += 3 * lineHeight; // Los 3 pasos
-            tempY += lineHeight; // Espacio después de pasos
-            tempY += 90; // Pie de página
-            calculatedHeight = tempY;
-            canvas.height = calculatedHeight;
-            drawReceipt();
-          };
-
-        } catch (error) {
-          console.error('Error fatal al generar el canvas:', error);
-          alert('Hubo un error al generar el comprobante. Por favor, toma una captura de pantalla manualmente.');
-        }
-      });
-    });
-  </script>
-</body>
-</html>
