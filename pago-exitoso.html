@@ -106,6 +106,7 @@
       const dateStr = urlParams.get('date');
       const orderID = urlParams.get('orderID');
       const promoCode = urlParams.get('promoCode'); // Leemos el código promocional
+      const paymentMethod = urlParams.get('paymentMethod'); // Leemos el método de pago
 
       // Lógica para evitar notificaciones duplicadas en Discord
       const notificationKey = `notified_${orderID}`;
@@ -178,11 +179,11 @@
           const ctx = canvas.getContext('2d');
 
           // Dimensiones y estilos
-          const width = 550; // Ancho de factura
-          const padding = 30;
-          const lineHeight = 30;
-          const lineSpacing = 20;
-          const logoSize = 60;
+          const width = 600; // Ancho de factura
+          const padding = 35;
+          const lineHeight = 32;
+          const lineSpacing = 22;
+          const logoSize = 70;
 
           let currentY = padding;
 
@@ -191,12 +192,13 @@
             { label: 'Usuario SA-MP:', value: username || 'No especificado' },
             { label: 'Producto:', value: itemName || 'No especificado' },
             { label: 'Monto Pagado:', value: document.getElementById('receipt-amount').textContent },
+            { label: 'Método de Pago:', value: paymentMethod || 'No especificado' },
             { label: 'Fecha del Pago:', value: document.getElementById('receipt-date').textContent },
             { label: 'ID de Transacción:', value: orderID || 'No especificado' }
           ];
 
-          // Calculamos la altura necesaria dinámicamente
-          const height = 550 + data.length * (lineHeight + lineSpacing);
+          // Calculamos la altura necesaria
+          const height = 600 + data.length * (lineHeight + lineSpacing);
           canvas.width = width;
           canvas.height = height;
 
@@ -209,80 +211,93 @@
           ctx.lineWidth = 4;
           ctx.strokeRect(0, 0, width, height);
 
-          // 3. Dibuja el logo (opcional, pero le da un toque profesional)
-          const logo = new Image(); // Usamos el logo del servidor
-          logo.src = 'logos/logo-gta-san-andreas.jpg';
-          ctx.drawImage(logo, padding, currentY, logoSize, logoSize);
+          // 3. Carga el logo y dibuja todo lo demás cuando esté listo
+          const logo = new Image();
+          logo.src = 'logos/logo-gta-san-andreas.jpg'; // Asegúrate que este logo exista
+          logo.onload = () => {
+            // --- Una vez que el logo ha cargado, dibujamos todo ---
 
-          // Dibuja el nombre del servidor
-          ctx.font = "bold 32px 'Rajdhani', sans-serif";
-          ctx.fillStyle = '#FFFFFF';
-          ctx.textAlign = 'left';
-          ctx.fillText('Creativos RP', padding + logoSize + 15, currentY + 40);
-          currentY += logoSize + lineSpacing;
+            // Dibuja el logo
+            ctx.drawImage(logo, padding, currentY, logoSize, logoSize);
 
-          // Línea divisoria del encabezado
-          ctx.beginPath();
-          ctx.moveTo(padding, currentY);
-          ctx.lineTo(width - padding, currentY);
-          ctx.strokeStyle = '#555';
-          ctx.lineWidth = 1;
-          ctx.stroke();
-          currentY += lineSpacing + lineHeight;
-
-          // 4. Dibuja el título del recibo
-          ctx.font = "bold 36px 'Permanent Marker', cursive";
-          ctx.fillStyle = '#32CD32';
-          ctx.textAlign = 'center';
-          ctx.fillText('RECIBO DE PAGO', width / 2, currentY);
-          currentY += 60;
-
-          // 5. Dibuja los detalles de la transacción
-          ctx.textAlign = 'left';
-          // "Facturado a:"
-          ctx.font = "22px 'Rajdhani', sans-serif";
-          ctx.fillStyle = '#aaa';
-          ctx.fillText('Facturado a:', padding, currentY);
-          ctx.font = "bold 24px 'Rajdhani', sans-serif";
-          ctx.fillStyle = '#FFFFFF';
-          ctx.fillText(username || 'No especificado', padding, currentY + lineHeight);
-          currentY += 80;
-
-          // Dibuja la tabla de detalles
-          data.forEach((item, index) => {
-            // Dibuja la etiqueta
-            ctx.font = "bold 24px 'Rajdhani', sans-serif";
-            ctx.fillStyle = '#FFD700';
-            ctx.fillText(item.label, padding, currentY);
-
-            // Dibuja el valor
-            ctx.font = "24px 'Rajdhani', sans-serif";
+            // Dibuja el nombre del servidor
+            ctx.font = "bold 36px 'Rajdhani', sans-serif";
             ctx.fillStyle = '#FFFFFF';
-            ctx.textAlign = 'right';
-            ctx.fillText(item.value, width - padding, currentY);
-            ctx.textAlign = 'left'; // Resetea la alineación
+            ctx.textAlign = 'left';
+            ctx.fillText('Creativos RP', padding + logoSize + 20, currentY + 45);
+            currentY += logoSize + lineSpacing;
 
-            currentY += lineHeight + lineSpacing;
-          });
+            // Línea divisoria del encabezado
+            ctx.beginPath();
+            ctx.moveTo(padding, currentY);
+            ctx.lineTo(width - padding, currentY);
+            ctx.strokeStyle = '#555';
+            ctx.lineWidth = 1;
+            ctx.stroke();
+            currentY += lineSpacing + lineHeight;
 
-          // 6. Dibuja el pie de página
-          ctx.beginPath();
-          ctx.moveTo(padding, height - 80);
-          ctx.lineTo(width - padding, height - 80);
-          ctx.stroke();
-          ctx.font = "20px 'Rajdhani', sans-serif";
-          ctx.fillStyle = '#aaa';
-          ctx.textAlign = 'center';
-          ctx.fillText('Gracias por su compra - Creativos RP', width / 2, height - 45);
+            // Dibuja el título del recibo
+            ctx.font = "bold 40px 'Permanent Marker', cursive";
+            ctx.fillStyle = '#32CD32';
+            ctx.textAlign = 'center';
+            ctx.fillText('RECIBO DE PAGO', width / 2, currentY);
+            currentY += 70;
 
-          // 7. Inicia la descarga
-          // Usamos un pequeño timeout para asegurar que el logo se dibuje si se carga rápido
-          setTimeout(() => {
+            // Dibuja los detalles de la transacción
+            ctx.textAlign = 'left';
+            // "Facturado a:"
+            ctx.font = "24px 'Rajdhani', sans-serif";
+            ctx.fillStyle = '#aaa';
+            ctx.fillText('Facturado a:', padding, currentY);
+            ctx.font = "bold 26px 'Rajdhani', sans-serif";
+            ctx.fillStyle = '#FFFFFF';
+            ctx.fillText(username || 'No especificado', padding, currentY + lineHeight);
+            currentY += 90;
+
+            // --- SOLUCIÓN AL SOLAPAMIENTO DE TEXTO ---
+            // Medimos la etiqueta más larga para crear una columna alineada
+            ctx.font = "bold 26px 'Rajdhani', sans-serif";
+            const labelWidths = data.map(item => ctx.measureText(item.label).width);
+            const maxLabelWidth = Math.max(...labelWidths);
+            const valueColumnX = padding + maxLabelWidth + 25; // Posición X para la columna de valores
+
+            // Dibuja la tabla de detalles
+            data.forEach((item) => {
+              // Dibuja la etiqueta
+              ctx.font = "bold 26px 'Rajdhani', sans-serif";
+              ctx.fillStyle = '#FFD700';
+              ctx.fillText(item.label, padding, currentY);
+
+              // Dibuja el valor en la columna alineada
+              ctx.font = "26px 'Rajdhani', sans-serif";
+              ctx.fillStyle = '#FFFFFF';
+              ctx.fillText(item.value, valueColumnX, currentY);
+
+              currentY += lineHeight + lineSpacing;
+            });
+
+            // Dibuja el pie de página
+            ctx.beginPath();
+            ctx.moveTo(padding, height - 90);
+            ctx.lineTo(width - padding, height - 90);
+            ctx.stroke();
+            ctx.font = "22px 'Rajdhani', sans-serif";
+            ctx.fillStyle = '#aaa';
+            ctx.textAlign = 'center';
+            ctx.fillText('Gracias por su compra - Creativos RP', width / 2, height - 50);
+
+            // Inicia la descarga
             const link = document.createElement('a');
             link.download = `comprobante-creativos-rp-${orderID || username}.png`;
             link.href = canvas.toDataURL('image/png');
             link.click();
-          }, 200); // 200ms es suficiente para que el logo cargue desde caché
+          };
+          
+          // Manejo de error si el logo no carga
+          logo.onerror = () => {
+            alert('No se pudo cargar el logo para el comprobante, pero la descarga continuará.');
+            logo.onload(); // Llama a la función de dibujo de todas formas
+          };
 
         } catch (error) {
           console.error('Error fatal al generar el canvas:', error);
