@@ -57,12 +57,12 @@
   <main class="success-container">
     <div class="success-box gta-section">
       <h1 class="gta-section-title">¡Transacción Aprobada!</h1>
-      <p class="gta-text" style="margin-bottom: 1rem;">
-        Gracias por tu compra, <strong id="display-username">jugador</strong>. Para recibir tus Coins, por favor sigue estos pasos:
+      <p id="intro-text" class="gta-text" style="margin-bottom: 1rem;">
+        Gracias por tu compra, <strong id="display-username">jugador</strong>.
       </p>
 
       <!-- Tabla de detalles de la compra -->
-      <table class="receipt-table" style="margin-bottom: 1rem;">
+      <table class="receipt-table" style="margin-bottom: 0.5rem;">
         <tbody>
           <tr><td>Usuario SA-MP:</td><td id="receipt-username">--</td></tr>
           <tr><td>Producto:</td><td id="receipt-item">--</td></tr>
@@ -77,7 +77,15 @@
           </tr>
         </tbody>
       </table>
-      <div class="gta-button-group">
+
+      <!-- NUEVO: Pasos para recibir Coins mostrados en la página -->
+      <p class="gta-text" style="text-align: left; display: inline-block; margin-top: 1rem; font-size: 0.9em;">
+        <strong id="steps-title-page" style="color: #FFD700;"></strong><br>
+        1. Descarga este recibo usando el botón de abajo.<br>
+        2. Únete a nuestro Discord y abre un ticket.<br>
+        3. Envía el recibo descargado al Staff para validar tu compra.
+      </p>
+      <div class="gta-button-group" style="margin-top: 1rem;">
         <button id="download-receipt-btn" class="gta-boton">Descargar Comprobante</button>
         <a href="https://discord.gg/EsgBcUCubQ" target="_blank" class="gta-boton">Ir a Discord</a>
         <a href="index.html" class="gta-boton">Volver al Inicio</a>
@@ -124,6 +132,17 @@
           // No es un error crítico para el usuario, por lo que no mostramos alerta.
         });
       }
+
+      // --- LÓGICA DE TEXTO DINÁMICO ---
+      const isCoinsPurchase = itemName && itemName.toLowerCase().includes('coins');
+      const deliveryItemText = isCoinsPurchase ? 'tus Coins' : 'tu producto';
+      const stepsTitleText = `Pasos para recibir ${deliveryItemText}:`;
+
+      // Actualiza el texto de introducción
+      document.getElementById('intro-text').innerHTML += ` Para recibir ${deliveryItemText}, por favor sigue estos pasos:`;
+
+      // Actualiza el título de los pasos en la página
+      document.getElementById('steps-title-page').textContent = stepsTitleText;
 
       // Mostramos los datos en la página
       document.getElementById('display-username').textContent = username || 'jugador';
@@ -191,8 +210,7 @@
             { label: 'ID de Transacción:', value: orderID || 'No especificado' }
           ];
 
-          // Calculamos la altura necesaria (añadimos espacio para los pasos)
-          const height = 600 + data.length * (lineHeight + lineSpacing) + 180; // Espacio extra para los pasos
+          let calculatedHeight = 0; // Se calculará dinámicamente
           canvas.width = width;
           canvas.height = height;
 
@@ -200,21 +218,21 @@
           ctx.fillStyle = '#1a1a1a';
           ctx.fillRect(0, 0, width, height);
 
-          // 2. Dibuja el borde
-          ctx.strokeStyle = '#FF8C00';
-          ctx.lineWidth = 4;
-          ctx.strokeRect(0, 0, width, height);
+          // Función principal para dibujar todo el recibo
+          const drawReceipt = () => {
+            let currentY = padding;
 
-          // 3. Carga el logo y dibuja todo lo demás cuando esté listo
-          const logo = new Image();
-          logo.src = 'logos/logo-gta-san-andreas.jpg'; // Asegúrate que este logo exista
-          logo.onload = () => {
-            // --- Una vez que el logo ha cargado, dibujamos todo ---
+            // 1. Dibuja el fondo
+            ctx.fillStyle = '#1a1a1a';
+            ctx.fillRect(0, 0, width, calculatedHeight);
 
-            // Dibuja el logo
+            // 2. Dibuja el borde
+            ctx.strokeStyle = '#FF8C00';
+            ctx.lineWidth = 4;
+            ctx.strokeRect(0, 0, width, calculatedHeight);
+
+            // 3. Dibuja el logo y nombre del servidor
             ctx.drawImage(logo, padding, currentY, logoSize, logoSize);
-
-            // Dibuja el nombre del servidor
             ctx.font = "bold 36px 'Rajdhani', sans-serif";
             ctx.fillStyle = '#FFFFFF';
             ctx.textAlign = 'left';
@@ -249,8 +267,7 @@
             currentY += 90;
 
             // --- SOLUCIÓN AL SOLAPAMIENTO DE TEXTO ---
-            // Medimos la etiqueta más larga para crear una columna alineada
-            ctx.font = "bold 26px 'Rajdhani', sans-serif";
+            ctx.font = "bold 26px 'Rajdhani', sans-serif"; // Set font for measurement
             const labelWidths = data.map(item => ctx.measureText(item.label).width);
             const maxLabelWidth = Math.max(...labelWidths);
             const valueColumnX = padding + maxLabelWidth + 25; // Posición X para la columna de valores
@@ -275,41 +292,75 @@
             ctx.font = "bold 24px 'Rajdhani', sans-serif";
             ctx.fillStyle = '#FFD700';
             ctx.textAlign = 'left';
-            ctx.fillText('Pasos para recibir tus Coins:', padding, currentY);
+            ctx.fillText(stepsTitleText, padding, currentY); // Usamos el título dinámico
             currentY += lineHeight;
 
             ctx.font = "22px 'Rajdhani', sans-serif";
             ctx.fillStyle = '#FFFFFF';
-            ctx.fillText('1. Toma una captura de pantalla de este recibo.', padding + 10, currentY);
+            ctx.fillText('1. Descarga este recibo.', padding + 10, currentY); // Redacción actualizada
             currentY += lineHeight;
             ctx.fillText('2. Únete a nuestro Discord y abre un ticket.', padding + 10, currentY);
             currentY += lineHeight;
-            ctx.fillText('3. Envía la captura al Staff para validar tu compra.', padding + 10, currentY);
+            ctx.fillText('3. Envía el recibo descargado al Staff para validar tu compra.', padding + 10, currentY); // Redacción actualizada
             currentY += lineHeight;
 
-            // Dibuja el pie de página (ajustado para el nuevo contenido)
+            // Dibuja el pie de página
             ctx.beginPath();
-            ctx.moveTo(padding, height - 80);
-            ctx.lineTo(width - padding, height - 80); // Línea más arriba
+            ctx.moveTo(padding, calculatedHeight - 80);
+            ctx.lineTo(width - padding, calculatedHeight - 80);
             ctx.stroke();
             ctx.font = "20px 'Rajdhani', sans-serif";
             ctx.fillStyle = '#aaa';
             ctx.textAlign = 'center';
-            ctx.fillText('Gracias por su compra - Creativos RP', width / 2, height - 45); // Texto más arriba
+            ctx.fillText('Gracias por su compra - Creativos RP', width / 2, calculatedHeight - 45);
 
-            // --- Inicia la descarga ---
-            // Aseguramos que el logo se dibuje antes de la descarga final
-            // (aunque ya lo manejamos con logo.onload, un pequeño timeout es un seguro extra)
+            // Inicia la descarga
             const link = document.createElement('a');
             link.download = `comprobante-creativos-rp-${orderID || username}.png`;
             link.href = canvas.toDataURL('image/png');
             link.click();
+          }; // Fin de drawReceipt
+
+          // --- Lógica de carga del logo y cálculo de altura ---
+          const logo = new Image();
+          logo.src = 'logos/logo-gta-san-andreas.jpg'; // Asegúrate que este logo exista
+          logo.onload = () => {
+            // Primero, calculamos la altura total que necesitará el canvas
+            let tempY = padding;
+            tempY += logoSize + lineSpacing; // Logo y nombre
+            tempY += lineSpacing + lineHeight; // Divisor
+            tempY += 70; // Título
+            tempY += 90; // Facturado a
+            tempY += data.length * (lineHeight + lineSpacing); // Detalles de la transacción
+            tempY += lineSpacing * 2; // Espacio antes de pasos
+            tempY += lineHeight; // Título de pasos
+            tempY += 3 * lineHeight; // Los 3 pasos
+            tempY += lineHeight; // Espacio después de pasos
+            tempY += 90; // Pie de página
+            calculatedHeight = tempY;
+
+            canvas.height = calculatedHeight; // Establecemos la altura final
+            drawReceipt(); // Ahora sí, dibujamos todo
           };
           
           // Manejo de error si el logo no carga
           logo.onerror = () => {
             alert('No se pudo cargar el logo para el comprobante, pero la descarga continuará.');
-            logo.onload(); // Llama a la función de dibujo de todas formas
+            // Si el logo falla, calculamos la altura y dibujamos sin él
+            let tempY = padding;
+            tempY += logoSize + lineSpacing; // Espacio que ocuparía el logo
+            tempY += lineSpacing + lineHeight; // Divisor
+            tempY += 70; // Título
+            tempY += 90; // Facturado a
+            tempY += data.length * (lineHeight + lineSpacing); // Detalles de la transacción
+            tempY += lineSpacing * 2; // Espacio antes de pasos
+            tempY += lineHeight; // Título de pasos
+            tempY += 3 * lineHeight; // Los 3 pasos
+            tempY += lineHeight; // Espacio después de pasos
+            tempY += 90; // Pie de página
+            calculatedHeight = tempY;
+            canvas.height = calculatedHeight;
+            drawReceipt();
           };
 
         } catch (error) {
