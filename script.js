@@ -428,6 +428,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Función para renderizar el botón de PayPal
   function renderPayPalButton(fundingSource) {
     const paypalButtonContainer = document.getElementById('paypal-button-container');
+    currentFundingSource = fundingSource; // Guardamos el método de pago actual
     // Limpia el contenedor antes de renderizar para evitar duplicados
     if (!paypalButtonContainer) return console.warn('Contenedor de PayPal no encontrado.');
     paypalButtonContainer.innerHTML = '';
@@ -525,10 +526,18 @@ document.addEventListener('DOMContentLoaded', () => {
             itemName = selectedOption.dataset.name;
           }
 
+          // Determinamos el método de pago para el recibo
+          let paymentMethod = 'Desconocido';
+          if (currentFundingSource === paypal.FUNDING.PAYPAL) {
+            paymentMethod = 'PayPal';
+          } else if (currentFundingSource === paypal.FUNDING.CARD) {
+            paymentMethod = 'Tarjeta de Débito/Crédito';
+          }
+
           // Añadimos el código promocional a la URL si se usó uno
           const promoCodeParam = appliedDiscount ? `&promoCode=${appliedDiscount.code}` : '';
 
-          window.location.href = `pago-exitoso.html?username=${encodeURIComponent(username)}&itemName=${encodeURIComponent(itemName)}&amount=${amount}&currency=${currency}&date=${transactionDate}&orderID=${data.orderID}${promoCodeParam}`;
+          window.location.href = `pago-exitoso.html?username=${encodeURIComponent(username)}&itemName=${encodeURIComponent(itemName)}&amount=${amount}&currency=${currency}&date=${transactionDate}&orderID=${data.orderID}${promoCodeParam}&paymentMethod=${encodeURIComponent(paymentMethod)}`;
         }).catch(function(error) {
           // --- PAGO FALLIDO (EJ. FONDOS INSUFICIENTES) ---
           console.error('Error al capturar el pago:', error);
@@ -642,8 +651,9 @@ document.addEventListener('DOMContentLoaded', () => {
         statusElement.style.color = '#32CD32';
         statusElement.style.display = 'block';
 
+        const paymentMethod = 'Código Promocional';
         setTimeout(() => {
-          window.location.href = `pago-exitoso.html?username=${encodeURIComponent(data.receiptUsername)}&itemName=${encodeURIComponent(itemName)}&amount=0.00&currency=USD&date=${new Date().toISOString()}&orderID=GRATIS-${new Date().getTime()}`;
+          window.location.href = `pago-exitoso.html?username=${encodeURIComponent(data.receiptUsername)}&itemName=${encodeURIComponent(itemName)}&amount=0.00&currency=USD&date=${new Date().toISOString()}&orderID=GRATIS-${new Date().getTime()}&paymentMethod=${encodeURIComponent(paymentMethod)}`;
         }, 2000);
         return;
       }
