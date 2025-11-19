@@ -1,6 +1,6 @@
 /*
   ================================================================
-  == SERVIDOR SEGURO PARA VALIDACIÓN DE CÓDIGOS PROMOCIONALES ==
+  == SERVIDOR SEGURO PARA VALIDACIÓN DE CÓDIGOS PROMOCIONALES Y NOTIFICACIONES ==
   ================================================================
   Este archivo debe ejecutarse en tu entorno de hosting (Node.js).
   NO es para el navegador. Contiene la lógica y los secretos.
@@ -83,7 +83,7 @@ async function sendDiscordNotification(details) {
       const codeData = promoCodes[details.promoCode];
       if (codeData) {
         if (codeData.adminOnly) {
-          embedFields.push({ name: 'Cupón Usado', value: 'Cupón Admin (100%)', inline: true });
+          embedFields.push({ name: 'Cupón Usado', value: 'Cupón Admin (100%)', inline: true }); // Muestra "Cupón Admin (100%)"
         } else {
           const discountValue = codeData.type === 'percent' ? `${codeData.value}%` : `${codeData.value} USD`;
           embedFields.push({ name: 'Cupón Usado', value: `${details.promoCode} (${discountValue})`, inline: true });
@@ -103,7 +103,7 @@ async function sendDiscordNotification(details) {
   }
 }
 
-/*
+/* 
   == ENDPOINT PARA VALIDAR CÓDIGOS PROMOCIONALES ==
   La página web enviará una petición aquí para ver si un código es válido.
 */
@@ -116,7 +116,7 @@ app.post('/validate-promo', (req, res) => {
     return res.status(400).json({ error: 'No se proporcionó ningún código.' });
   }
 
-  const codeData = promoCodes[code.toUpperCase()];
+  const codeData = promoCodes[code.toUpperCase()]; // Busca el código en la lista
   
   if (!codeData) {
     return res.status(404).json({ error: 'Código no válido o expirado.' });
@@ -125,7 +125,7 @@ app.post('/validate-promo', (req, res) => {
   // Lógica especial para el código de administrador
   if (codeData.adminOnly && username !== 'admincr_admincr') {
     return res.status(403).json({ error: 'Este código es de uso exclusivo.' });
-  }
+  } // Si el código es de admin y el usuario no es admincr_admincr, deniega el acceso
   
   // Si todo está bien, devolvemos los detalles del descuento
   res.json({
@@ -146,7 +146,7 @@ app.post('/log-purchase', (req, res) => {
   const purchaseDetails = req.body;
 
   // Llama a la función que envía la notificación a Discord
-  sendDiscordNotification(purchaseDetails);
+  sendDiscordNotification(purchaseDetails); // Esta es la única llamada a la función de notificación
 
   res.status(200).json({ message: 'Notificación procesada.' });
 });
