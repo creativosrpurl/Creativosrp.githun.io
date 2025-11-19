@@ -178,9 +178,12 @@
           const ctx = canvas.getContext('2d');
 
           // Dimensiones y estilos
-          const width = 800;
-          const padding = 40;
-          const lineHeight = 38;
+          const width = 550; // Ancho de factura
+          const padding = 30;
+          const lineHeight = 30;
+          const lineSpacing = 20;
+          const logoSize = 60;
+
           let currentY = padding;
 
           // Datos a dibujar
@@ -192,16 +195,104 @@
             { label: 'ID de Transacción:', value: orderID || 'No especificado' }
           ];
 
-          // Calculamos la altura necesaria
-          const height = padding * 2 + 80 + data.length * lineHeight;
+          // Calculamos la altura necesaria dinámicamente
+          const height = 550 + data.length * (lineHeight + lineSpacing);
           canvas.width = width;
           canvas.height = height;
 
           // 1. Dibuja el fondo
-          ctx.fillStyle = '#111';
+          ctx.fillStyle = '#1a1a1a';
           ctx.fillRect(0, 0, width, height);
 
-          // 2. Dibuja el título
+          // 2. Dibuja el borde
+          ctx.strokeStyle = '#FF8C00';
+          ctx.lineWidth = 4;
+          ctx.strokeRect(0, 0, width, height);
+
+          // 3. Dibuja el logo (opcional, pero le da un toque profesional)
+          const logo = new Image(); // Usamos el logo del servidor
+          logo.src = 'logos/logo-gta-san-andreas.jpg';
+          ctx.drawImage(logo, padding, currentY, logoSize, logoSize);
+
+          // Dibuja el nombre del servidor
+          ctx.font = "bold 32px 'Rajdhani', sans-serif";
+          ctx.fillStyle = '#FFFFFF';
+          ctx.textAlign = 'left';
+          ctx.fillText('Creativos RP', padding + logoSize + 15, currentY + 40);
+          currentY += logoSize + lineSpacing;
+
+          // Línea divisoria del encabezado
+          ctx.beginPath();
+          ctx.moveTo(padding, currentY);
+          ctx.lineTo(width - padding, currentY);
+          ctx.strokeStyle = '#555';
+          ctx.lineWidth = 1;
+          ctx.stroke();
+          currentY += lineSpacing + lineHeight;
+
+          // 4. Dibuja el título del recibo
+          ctx.font = "bold 36px 'Permanent Marker', cursive";
+          ctx.fillStyle = '#32CD32';
+          ctx.textAlign = 'center';
+          ctx.fillText('RECIBO DE PAGO', width / 2, currentY);
+          currentY += 60;
+
+          // 5. Dibuja los detalles de la transacción
+          ctx.textAlign = 'left';
+          // "Facturado a:"
+          ctx.font = "22px 'Rajdhani', sans-serif";
+          ctx.fillStyle = '#aaa';
+          ctx.fillText('Facturado a:', padding, currentY);
+          ctx.font = "bold 24px 'Rajdhani', sans-serif";
+          ctx.fillStyle = '#FFFFFF';
+          ctx.fillText(username || 'No especificado', padding, currentY + lineHeight);
+          currentY += 80;
+
+          // Dibuja la tabla de detalles
+          data.forEach((item, index) => {
+            // Dibuja la etiqueta
+            ctx.font = "bold 24px 'Rajdhani', sans-serif";
+            ctx.fillStyle = '#FFD700';
+            ctx.fillText(item.label, padding, currentY);
+
+            // Dibuja el valor
+            ctx.font = "24px 'Rajdhani', sans-serif";
+            ctx.fillStyle = '#FFFFFF';
+            ctx.textAlign = 'right';
+            ctx.fillText(item.value, width - padding, currentY);
+            ctx.textAlign = 'left'; // Resetea la alineación
+
+            currentY += lineHeight + lineSpacing;
+          });
+
+          // 6. Dibuja el pie de página
+          ctx.beginPath();
+          ctx.moveTo(padding, height - 80);
+          ctx.lineTo(width - padding, height - 80);
+          ctx.stroke();
+          ctx.font = "20px 'Rajdhani', sans-serif";
+          ctx.fillStyle = '#aaa';
+          ctx.textAlign = 'center';
+          ctx.fillText('Gracias por su compra - Creativos RP', width / 2, height - 45);
+
+          // 7. Inicia la descarga
+          // Usamos un pequeño timeout para asegurar que el logo se dibuje si se carga rápido
+          setTimeout(() => {
+            const link = document.createElement('a');
+            link.download = `comprobante-creativos-rp-${orderID || username}.png`;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+          }, 200); // 200ms es suficiente para que el logo cargue desde caché
+
+        } catch (error) {
+          console.error('Error fatal al generar el canvas:', error);
+          alert('Hubo un error al generar el comprobante. Por favor, toma una captura de pantalla manualmente.');
+        }
+      });
+    });
+  </script>
+</body>
+</html>
           ctx.font = "bold 42px 'Permanent Marker', cursive";
           ctx.fillStyle = '#32CD32';
           ctx.textAlign = 'center';
