@@ -281,6 +281,26 @@
               currentY += lineHeight + lineSpacing;
             });
 
+            // --- Función para dibujar texto con ajuste de línea automático ---
+            const drawWrappedText = (text, x, y, maxWidth, lineHeight) => {
+              const words = text.split(' ');
+              let line = '';
+              for (let n = 0; n < words.length; n++) {
+                const testLine = line + words[n] + ' ';
+                const metrics = ctx.measureText(testLine);
+                const testWidth = metrics.width;
+                if (testWidth > maxWidth && n > 0) {
+                  ctx.fillText(line, x, y);
+                  line = words[n] + ' ';
+                  y += lineHeight;
+                } else {
+                  line = testLine;
+                }
+              }
+              ctx.fillText(line, x, y);
+              return y; // Devuelve la nueva posición Y
+            };
+
             // --- Dibuja los pasos para recibir los Coins ---
             currentY += lineSpacing * 2; // Espacio antes de los pasos
             ctx.font = "bold 24px 'Rajdhani', sans-serif";
@@ -291,11 +311,11 @@
 
             ctx.font = "22px 'Rajdhani', sans-serif";
             ctx.fillStyle = '#FFFFFF';
-            ctx.fillText('1. Descarga este recibo.', padding + 10, currentY); // Redacción actualizada
+            currentY = drawWrappedText('1. Descarga este recibo.', padding + 10, currentY, width - padding * 2 - 10, lineHeight);
             currentY += lineHeight;
-            ctx.fillText('2. Únete a nuestro Discord y abre un ticket.', padding + 10, currentY);
+            currentY = drawWrappedText('2. Únete a nuestro Discord y abre un ticket.', padding + 10, currentY, width - padding * 2 - 10, lineHeight);
             currentY += lineHeight;
-            ctx.fillText('3. Envía el recibo descargado al Staff para validar tu compra.', padding + 10, currentY); // Redacción actualizada
+            currentY = drawWrappedText('3. Envía el recibo descargado al Staff para validar tu compra.', padding + 10, currentY, width - padding * 2 - 10, lineHeight);
             currentY += lineHeight;
 
             // Dibuja el pie de página
