@@ -210,13 +210,7 @@
             { label: 'ID de Transacción:', value: orderID || 'No especificado' }
           ];
 
-          let calculatedHeight = 0; // Se calculará dinámicamente
-          canvas.width = width;
-          canvas.height = height;
-
-          // 1. Dibuja el fondo
-          ctx.fillStyle = '#1a1a1a';
-          ctx.fillRect(0, 0, width, height);
+          canvas.width = width; // Establecemos el ancho del canvas
 
           // Función principal para dibujar todo el recibo
           const drawReceipt = () => {
