@@ -11,6 +11,7 @@
 const express = require('express');
 const cors = require('cors');
 const { Client, GatewayIntentBits, EmbedBuilder } = require('discord.js');
+const { randomUUID } = require('crypto'); // Importamos una función para generar IDs únicos
 
 // Creamos la aplicación del servidor
 const app = express();
@@ -141,11 +142,13 @@ app.post('/validate-promo', (req, res) => {
   La página de pago exitoso llamará aquí para que el servidor envíe la alerta.
 */
 app.post('/log-purchase', (req, res) => {
-  console.log(`[${new Date().toISOString()}] INFO: Recibida petición para registrar compra.`);
+  const requestId = randomUUID(); // Generamos un ID único para esta petición
+  console.log(`[${new Date().toISOString()}] INFO: [${requestId}] Recibida petición para registrar compra.`);
 
   const purchaseDetails = req.body;
 
   // Llama a la función que envía la notificación a Discord
+  console.log(`[${new Date().toISOString()}] INFO: [${requestId}] Enviando notificación para OrderID: ${purchaseDetails.orderID}`);
   sendDiscordNotification(purchaseDetails); // Esta es la única llamada a la función de notificación
 
   res.status(200).json({ message: 'Notificación procesada.' });
