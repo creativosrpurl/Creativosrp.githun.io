@@ -83,9 +83,9 @@ async function sendDiscordNotification(details) {
       const codeData = promoCodes[details.promoCode];
       if (codeData) {
         if (codeData.adminOnly) {
-          embedFields.push({ name: 'Cupón Usado', value: 'Admin (Gratis)', inline: true });
+          embedFields.push({ name: 'Cupón Usado', value: 'Cupón Admin (100%)', inline: true });
         } else {
-          const discountValue = codeData.type === 'percent' ? `${codeData.value}%` : `$${codeData.value} USD`;
+          const discountValue = codeData.type === 'percent' ? `${codeData.value}%` : `${codeData.value} USD`;
           embedFields.push({ name: 'Cupón Usado', value: `${details.promoCode} (${discountValue})`, inline: true });
         }
       }
