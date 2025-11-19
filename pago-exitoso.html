@@ -325,7 +325,19 @@
           const logo = new Image();
           logo.src = 'logos/logo-gta-san-andreas.jpg'; // Asegúrate que este logo exista
           logo.onload = () => {
-            // Primero, calculamos la altura total que necesitará el canvas
+            // Primero, calculamos la altura final que necesitará el canvas y luego dibujamos
+            calculateHeightAndDraw();
+          };
+          
+          // Manejo de error si el logo no carga
+          logo.onerror = () => {
+            alert('No se pudo cargar el logo para el comprobante, pero la descarga continuará.');
+            // Si el logo falla, calculamos la altura y dibujamos sin él
+            calculateHeightAndDraw();
+          };
+
+          const calculateHeightAndDraw = () => {
+            // --- CÁLCULO DE ALTURA ---
             let tempY = padding;
             tempY += logoSize + lineSpacing; // Logo y nombre
             tempY += lineSpacing + lineHeight; // Divisor
@@ -339,7 +351,22 @@
             tempY += 90; // Pie de página
             calculatedHeight = tempY;
 
-            canvas.height = calculatedHeight; // Establecemos la altura final
+            canvas.height = calculatedHeight; // Establecemos la altura final del canvas
+
+            // --- DIBUJADO FINAL ---
+            // Ahora que la altura es correcta, llamamos a la función que dibuja todo
+            drawReceipt();
+          }
+
+        } catch (error) {
+          console.error('Error fatal al generar el canvas:', error);
+          alert('Hubo un error al generar el comprobante. Por favor, toma una captura de pantalla manualmente.');
+        }
+      });
+    });
+  </script>
+</body>
+</html>
             drawReceipt(); // Ahora sí, dibujamos todo
           };
           
