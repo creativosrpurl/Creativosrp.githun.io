@@ -1,3 +1,23 @@
+/* --- MEJORA DE RENDIMIENTO Y FIABILIDAD: Fuentes Incrustadas --- */
+/* Se incrustan las fuentes directamente para evitar problemas de carga
+   y asegurar que la descarga del comprobante funcione siempre. */
+
+/* Rajdhani */
+@font-face {
+  font-family: 'Rajdhani';
+  font-style: normal;
+  font-weight: 600;
+  src: url(https://fonts.gstatic.com/s/rajdhani/v15/LDI2apCSOBg7S-QT7pas_w.woff2) format('woff2');
+}
+
+/* Permanent Marker */
+@font-face {
+  font-family: 'Permanent Marker';
+  font-style: normal;
+  font-weight: 400;
+  src: url(https://fonts.gstatic.com/s/permanentmarker/v16/Fh4uPib9Iyv2ucM6pGQMWimMp004La2Cfw.woff2) format('woff2');
+}
+
 /* Estilos globales con tipografía y colores de GTA */
 body {
   margin: 0;
