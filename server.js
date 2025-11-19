@@ -117,16 +117,16 @@ app.post('/validate-promo', (req, res) => {
   }
 
   const codeData = promoCodes[code.toUpperCase()];
-
+  
   if (!codeData) {
     return res.status(404).json({ error: 'Código no válido o expirado.' });
   }
-
+  
   // Lógica especial para el código de administrador
   if (codeData.adminOnly && username !== 'admincr_admincr') {
     return res.status(403).json({ error: 'Este código es de uso exclusivo.' });
   }
-
+  
   // Si todo está bien, devolvemos los detalles del descuento
   res.json({
     success: true,
