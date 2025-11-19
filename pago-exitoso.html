@@ -10,8 +10,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="stylesheet" href="styles.css">
 
-  <!-- Librería para generar la imagen del comprobante -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" integrity="sha512-BNaRQnYJYiPSqHHDb58B0yaPfCu+Wgds8Gp/gU33kqBtgNS4tSPHuGibyoVBL5gI9kDXrdZEo8NNYCKaYHNssg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <!-- Ya no se necesita la librería html2canvas -->
   <script defer src="utils.js"></script> <!-- Archivo de utilidades compartidas -->
 
   <style>
@@ -173,50 +172,69 @@
       // Lógica para descargar el comprobante
       const downloadBtn = document.getElementById('download-receipt-btn');
       downloadBtn.addEventListener('click', () => {
-        downloadBtn.textContent = 'Generando imagen...';
-        downloadBtn.disabled = true;
+        try {
+          // --- ESTRATEGIA FINAL: DIBUJAR MANUALMENTE EN CANVAS ---
+          const canvas = document.createElement('canvas');
+          const ctx = canvas.getContext('2d');
 
-        // Añadimos un timeout para evitar que se quede "pegado" indefinidamente
-        const generationTimeout = setTimeout(() => {
-          downloadBtn.textContent = 'Descargar Comprobante';
-          downloadBtn.disabled = false;
-          alert('La generación de la imagen tardó demasiado. Es posible que estés abriendo el archivo localmente. Por favor, usa un servidor web o toma una captura de pantalla manualmente.');
-        }, 10000); // 10 segundos
+          // Dimensiones y estilos
+          const width = 800;
+          const padding = 40;
+          const lineHeight = 38;
+          let currentY = padding;
 
-        // --- ESTRATEGIA DE CAPTURA ROBUSTA ---
-        // 1. Ocultamos elementos pesados que pueden causar problemas.
-        const pageBackground = document.getElementById('gta-bg');
-        if (pageBackground) pageBackground.style.display = 'none';
+          // Datos a dibujar
+          const data = [
+            { label: 'Usuario SA-MP:', value: username || 'No especificado' },
+            { label: 'Producto:', value: itemName || 'No especificado' },
+            { label: 'Monto Pagado:', value: document.getElementById('receipt-amount').textContent },
+            { label: 'Fecha del Pago:', value: document.getElementById('receipt-date').textContent },
+            { label: 'ID de Transacción:', value: orderID || 'No especificado' }
+          ];
 
-        // 2. Guardamos el estilo original del successBox y aplicamos uno simple para la captura.
-        const originalBoxStyle = successBox.style.cssText;
-        successBox.style.background = '#000'; // Fondo negro sólido para la captura.
+          // Calculamos la altura necesaria
+          const height = padding * 2 + 80 + data.length * lineHeight;
+          canvas.width = width;
+          canvas.height = height;
 
-        // Usamos html2canvas para "fotografiar" el div del comprobante
-        html2canvas(successBox, {
-          scale: 2, // Aumenta la resolución de la imagen
-          logging: false, // Desactivamos los logs para una operación más limpia.
-        }).then(canvas => {
-          clearTimeout(generationTimeout); // Si funciona, cancelamos el timeout
+          // 1. Dibuja el fondo
+          ctx.fillStyle = '#111';
+          ctx.fillRect(0, 0, width, height);
 
-          // Creamos un enlace temporal para la descarga
+          // 2. Dibuja el título
+          ctx.font = "bold 42px 'Permanent Marker', cursive";
+          ctx.fillStyle = '#32CD32';
+          ctx.textAlign = 'center';
+          currentY += 40;
+          ctx.fillText('¡Transacción Aprobada!', width / 2, currentY);
+          currentY += 80;
+
+          // 3. Dibuja los detalles de la transacción
+          ctx.textAlign = 'left';
+          data.forEach(item => {
+            // Dibuja la etiqueta
+            ctx.font = "bold 28px 'Rajdhani', sans-serif";
+            ctx.fillStyle = '#FFD700';
+            ctx.fillText(item.label, padding, currentY);
+
+            // Dibuja el valor
+            ctx.font = "28px 'Rajdhani', sans-serif";
+            ctx.fillStyle = '#FFFFFF';
+            ctx.fillText(item.value, padding + 300, currentY);
+            
+            currentY += lineHeight;
+          });
+
+          // 4. Inicia la descarga
           const link = document.createElement('a');
           link.download = `comprobante-creativos-rp-${orderID || username}.png`;
           link.href = canvas.toDataURL('image/png');
-          link.click(); // Simulamos un clic para iniciar la descarga
-        }).catch((error) => {
-            clearTimeout(generationTimeout); // Si falla, también cancelamos el timeout
-            console.error('Error al generar el comprobante:', error);
-            alert('Hubo un error al generar la imagen. Por favor, toma una captura de pantalla manualmente.');
-        }).finally(() => {
-            // 3. RESTAURAMOS TODO: Volvemos a mostrar el fondo y restauramos el estilo original del box.
-            if (pageBackground) pageBackground.style.display = 'block';
-            successBox.style.cssText = originalBoxStyle;
+          link.click();
 
-          // Restauramos el botón
-          downloadBtn.textContent = 'Descargar Comprobante';
-          downloadBtn.disabled = false;
-        });
+        } catch (error) {
+          console.error('Error fatal al generar el canvas:', error);
+          alert('Hubo un error al generar el comprobante. Por favor, toma una captura de pantalla manualmente.');
+        }
       });
     });
   </script>
