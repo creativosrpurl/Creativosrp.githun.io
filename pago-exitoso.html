@@ -33,7 +33,7 @@
     }
     .receipt-table {
       width: 100%;
-      margin-top: 1.5rem; /* Reducido */
+      margin-top: 1rem; /* Reducido */
       text-align: left;
       border-collapse: collapse;
     }
@@ -62,7 +62,7 @@
       </p>
 
       <!-- Tabla de detalles de la compra -->
-      <table class="receipt-table">
+      <table class="receipt-table" style="margin-bottom: 1rem;">
         <tbody>
           <tr><td>Usuario SA-MP:</td><td id="receipt-username">--</td></tr>
           <tr><td>Producto:</td><td id="receipt-item">--</td></tr>
@@ -77,12 +77,6 @@
           </tr>
         </tbody>
       </table>
-
-      <p class="gta-text" style="text-align: left; display: inline-block; margin-top: 1rem; font-size: 0.9em;">
-        1. Toma una <strong>captura de pantalla</strong> de esta página o del correo de confirmación de PayPal.<br>
-        2. Únete a nuestro Discord y abre un ticket.<br>
-        3. Envía la captura al Staff para que validen tu compra y te entreguen los Coins en el juego.
-      </p>
       <div class="gta-button-group">
         <button id="download-receipt-btn" class="gta-boton">Descargar Comprobante</button>
         <a href="https://discord.gg/EsgBcUCubQ" target="_blank" class="gta-boton">Ir a Discord</a>
@@ -197,8 +191,8 @@
             { label: 'ID de Transacción:', value: orderID || 'No especificado' }
           ];
 
-          // Calculamos la altura necesaria
-          const height = 600 + data.length * (lineHeight + lineSpacing);
+          // Calculamos la altura necesaria (añadimos espacio para los pasos)
+          const height = 600 + data.length * (lineHeight + lineSpacing) + 180; // Espacio extra para los pasos
           canvas.width = width;
           canvas.height = height;
 
@@ -276,17 +270,36 @@
               currentY += lineHeight + lineSpacing;
             });
 
-            // Dibuja el pie de página
-            ctx.beginPath();
-            ctx.moveTo(padding, height - 90);
-            ctx.lineTo(width - padding, height - 90);
-            ctx.stroke();
+            // --- Dibuja los pasos para recibir los Coins ---
+            currentY += lineSpacing * 2; // Espacio antes de los pasos
+            ctx.font = "bold 24px 'Rajdhani', sans-serif";
+            ctx.fillStyle = '#FFD700';
+            ctx.textAlign = 'left';
+            ctx.fillText('Pasos para recibir tus Coins:', padding, currentY);
+            currentY += lineHeight;
+
             ctx.font = "22px 'Rajdhani', sans-serif";
+            ctx.fillStyle = '#FFFFFF';
+            ctx.fillText('1. Toma una captura de pantalla de este recibo.', padding + 10, currentY);
+            currentY += lineHeight;
+            ctx.fillText('2. Únete a nuestro Discord y abre un ticket.', padding + 10, currentY);
+            currentY += lineHeight;
+            ctx.fillText('3. Envía la captura al Staff para validar tu compra.', padding + 10, currentY);
+            currentY += lineHeight;
+
+            // Dibuja el pie de página (ajustado para el nuevo contenido)
+            ctx.beginPath();
+            ctx.moveTo(padding, height - 80);
+            ctx.lineTo(width - padding, height - 80); // Línea más arriba
+            ctx.stroke();
+            ctx.font = "20px 'Rajdhani', sans-serif";
             ctx.fillStyle = '#aaa';
             ctx.textAlign = 'center';
-            ctx.fillText('Gracias por su compra - Creativos RP', width / 2, height - 50);
+            ctx.fillText('Gracias por su compra - Creativos RP', width / 2, height - 45); // Texto más arriba
 
-            // Inicia la descarga
+            // --- Inicia la descarga ---
+            // Aseguramos que el logo se dibuje antes de la descarga final
+            // (aunque ya lo manejamos con logo.onload, un pequeño timeout es un seguro extra)
             const link = document.createElement('a');
             link.download = `comprobante-creativos-rp-${orderID || username}.png`;
             link.href = canvas.toDataURL('image/png');
@@ -298,44 +311,6 @@
             alert('No se pudo cargar el logo para el comprobante, pero la descarga continuará.');
             logo.onload(); // Llama a la función de dibujo de todas formas
           };
-
-        } catch (error) {
-          console.error('Error fatal al generar el canvas:', error);
-          alert('Hubo un error al generar el comprobante. Por favor, toma una captura de pantalla manualmente.');
-        }
-      });
-    });
-  </script>
-</body>
-</html>
-          ctx.font = "bold 42px 'Permanent Marker', cursive";
-          ctx.fillStyle = '#32CD32';
-          ctx.textAlign = 'center';
-          currentY += 40;
-          ctx.fillText('¡Transacción Aprobada!', width / 2, currentY);
-          currentY += 80;
-
-          // 3. Dibuja los detalles de la transacción
-          ctx.textAlign = 'left';
-          data.forEach(item => {
-            // Dibuja la etiqueta
-            ctx.font = "bold 28px 'Rajdhani', sans-serif";
-            ctx.fillStyle = '#FFD700';
-            ctx.fillText(item.label, padding, currentY);
-
-            // Dibuja el valor
-            ctx.font = "28px 'Rajdhani', sans-serif";
-            ctx.fillStyle = '#FFFFFF';
-            ctx.fillText(item.value, padding + 300, currentY);
-            
-            currentY += lineHeight;
-          });
-
-          // 4. Inicia la descarga
-          const link = document.createElement('a');
-          link.download = `comprobante-creativos-rp-${orderID || username}.png`;
-          link.href = canvas.toDataURL('image/png');
-          link.click();
 
         } catch (error) {
           console.error('Error fatal al generar el canvas:', error);
